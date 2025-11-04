@@ -1,6 +1,36 @@
-#Player{
-    position: absolute; 
-    bottom: 250px;
-    left: 50px;
-    background-color: green;
+#Player {
+    position: absolute;
+    bottom: 40%;
+    left: 15%;
+}
+
+#Game {
+    background-color: antiquewhite;
+    width: 70vw;
+    height: 80vh;
+    position: absolute;
+    left: 15vw;
+    bottom: 10vh;
+    overflow: hidden;
+
+}
+
+#Floor {
+    position: absolute;
+    height: 48px;
+    width: 80px;
+    bottom: calc(40% - 39px);
+    left: 15%;
+    background-image: url('GreenGrassBlock.png');
+    background-repeat: repeat-x;
+    transition: width 1s ease-in;
+}
+
+#Floor.FloorExpanded {
+    width: 200vw; 
+}
+
+.JumpAndRotate {
+    transition: transform 1.4s ease-out;
+    transform: rotate(360deg);
 }
