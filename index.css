@@ -1,18 +1,80 @@
+@font-face {
+    font-family: 'MyFont';
+    src: url('Resources/font.otf') format('truetype');
+}
+
 #Player {
     position: absolute;
     bottom: 40%;
     left: 15%;
+    background-image: url("Resources/dinosaur.png");
+    background-size: contain;
+    height: 75px;
+    width: 80px;
+    z-index: 5;
 }
 
-#Game {
-    background-color: antiquewhite;
-    width: 70vw;
-    height: 80vh;
+#Video{
+    position: fixed;
+    right: 0px;
+    top: 0px;
+    min-height: 100%;
+    min-width: 100%;
+    z-index: -1;
+}
+#Menu { 
     position: absolute;
-    left: 15vw;
-    bottom: 10vh;
-    overflow: hidden;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    font-family: 'MyFont';
+    font-size: 70px;
+    letter-spacing: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; 
+    /* overflow: hidden; */
+}
+#Title{
+    font-size: 100px;
+}
 
+#StartButton {
+  font-family: 'Press Start 2P';
+  background-color: #f4c16d;
+  color: #5a3a1b;
+  border: 3px solid #8b5a2b;
+  border-radius: 6px;
+  padding: 12px 24px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 4px #8b5a2b;
+}
+
+#StartButton:hover {
+  transition: all 0.1s ease-in-out;
+  background-color: #ffd98e;
+  color: #3a1f0b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px #8b5a2b;
+}
+
+#StartButton:active {
+  background-color: #e6b15e;
+  transform: translateY(2px);
+  box-shadow: 0 2px #8b5a2b;
+}
+#Game {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0%;
+    bottom: 0%;
+    overflow: hidden;
+    visibility: hidden;
 }
 
 #Floor {
@@ -21,13 +83,13 @@
     width: 80px;
     bottom: calc(40% - 39px);
     left: 15%;
-    background-image: url('GreenGrassBlock.png');
+    background-image: url("Resources/GreenGrassBlock.png");
     background-repeat: repeat-x;
     transition: width 1s ease-in;
 }
 
 #Floor.FloorExpanded {
-    width: 200vw; 
+    width: 200vw;
 }
 
 .JumpAndRotate {

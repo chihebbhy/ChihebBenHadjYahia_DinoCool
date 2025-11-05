@@ -8,22 +8,28 @@
 
     </head>
     <body>
-        <section name="Title" id="Title">
-            <h1>Welcome to my Game</h1>
-        </section>
+        <div id="Menu">
+            <video autoplay muted loop id="Video">
+                <source src="Resources/background.mp4" type="video/mp4">
+            </video>
+            <section name="Title" id="Title">
+                DinoCool
+            </section>
+            <section>
+                Welcome to my game
+            </section>
+            <button id="StartButton" onclick="StartGame()">Start game</button>
 
-        <button id="StartButton" onclick="StartGame()">Start</button>
+            <h3>
+                Highest Score: 00000
+            </h3>
 
-        <h3 name="Score" id="Score">
-            Score: 00000
-        </h3>
-
+        </div>
         <section name="Game" id="Game">
-
+            <h3 name="Score" id="Score">
+                Score: 00000
+            </h3>
             <div name="Player" id="Player">
-
-                <img src="dinosaur.png" alt="dinosaur" height="80" width="80">
-
             </div>
             <div id="Floor" name="Floor"></div>
             <div></div>
