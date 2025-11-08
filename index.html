@@ -26,13 +26,20 @@
 
         </div>
         <section name="Game" id="Game">
+            <video autoplay muted loop id="Video">
+                <source src="Resources/background.mp4" type="video/mp4">
+            </video>
+            <button onclick="ResetGame()" id="ResetGame">Menu </button>
             <h3 name="Score" id="Score">
                 Score: 00000
             </h3>
-            <div name="Player" id="Player">
+            <div name="Player" id="Player" class="Standing"></div>
+            <div id="Enemies">
+
             </div>
-            <div id="Floor" name="Floor"></div>
-            <div></div>
+            <div id="Floor" name="Floor">   
+                
+            </div>
         </section>
         <script src="index.js"></script>
     </body>
