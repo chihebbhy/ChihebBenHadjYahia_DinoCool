@@ -2,38 +2,95 @@
     font-family: 'MyFont';
     src: url('Resources/font.otf') format('truetype');
 }
-html{
+
+html {
     user-select: none;
-    overflow: hidden; 
+    overflow: hidden;
+    
+    image-rendering: pixelated;
 }
 
 /* -----------------Player----------------- */
 
 #Player {
     position: absolute;
-    bottom: 40%;
+    bottom: 96px;
     left: 15%;
     background-size: cover;
-
     z-index: 5;
+    overflow: hidden;
 }
-.JumpAndRotate {
-    transition: transform 1.4s ease-out;
-    transform: rotate(360deg);
-}
-.Duck{
-    background-image: url("Resources/output-onlinepngtools.png");
-    width: 92px;
-    height: 43px;   
-}   
-.Standing{
-    background-image: url("Resources/dinosaur.png");
-    height: 75px;
-    width: 80px;
-} 
 
-/* ----------------------------------------------- */
-#Video{
+.Standing {
+    height: calc(28px * 5);  
+    width: calc(32px * 5);   
+    animation: run 1s infinite ;
+}
+
+.JumpAndRotate {
+    background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur1.png");
+        height: calc(28px * 5);  
+    width: calc(32px * 5); 
+    transition: transform 1.4s ease-out;
+    transform: rotate(360deg) ;
+}
+
+.Duck {
+    background-image: url("Resources/pixil-frame-0\ \(4\).png");
+    width: calc(35px * 4.5); /* 135 */
+    height: calc(18px * 4.5) ; /* 63 */
+    animation: none;
+
+
+}
+
+@keyframes run {
+    0% , 13% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur9.png");}
+    14% , 27% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur10.png");}
+    28% , 41% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur11.png");}
+    42% , 55% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur12.png");}
+    56% , 70% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur13.png");}
+    71% , 85% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur14.png");}
+    86% , 100% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur15.png");}
+}
+
+/* --------------------FLOOR------------------------- */
+
+#Floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: calc(2304px );
+    height: calc(96px);
+    background-repeat: repeat-x;
+    background-size: contain;
+    background-position-x: 0;
+    z-index: 10;
+}
+
+#Floor div.FloorExpanded {
+    width: 2000px;
+}  
+
+/* ----------------------SCORE-------------------------- */
+
+#Score{
+    background-color: #ffd98e;
+    font-size: 50px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    min-width: 270px;
+    padding: 8px;
+    letter-spacing: 2px;
+    border: 2px solid #8b5a2b;
+    border-radius: 8px;    
+    font-family: 'Myfont','Courier New', Courier, monospace;
+    text-align: left;
+}
+
+/* ----------------------------------------------------- */
+#Video {
     position: fixed;
     right: 0px;
     top: 0px;
@@ -41,7 +98,8 @@ html{
     min-width: 100%;
     z-index: -1;
 }
-#Menu { 
+
+#Menu {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -53,44 +111,49 @@ html{
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column; 
+    flex-direction: column;
 }
-#Title{
+
+#Title {
     font-size: 6.25rem;
 }
 
-#StartButton ,#ResetGame{
-  font-family: 'Press Start 2P';
-  background-color: #f4c16d;
-  color: #5a3a1b;
-  border: 3px solid #8b5a2b;
-  border-radius: 6px;
-  padding: 12px 24px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  box-shadow: 0 4px #8b5a2b;
+#StartButton,
+#ResetGame {
+    font-family: 'Press Start 2P';
+    background-color: #f4c16d;
+    color: #5a3a1b;
+    border: 3px solid #8b5a2b;
+    border-radius: 6px;
+    padding: 12px 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 4px #8b5a2b;
 }
 
-#ResetGame{
+#ResetGame {
     position: absolute;
     right: 20px;
     top: 20px;
 }
 
-#StartButton:hover ,#ResetGame:hover{
-  transition: all 0.1s ease-in-out;
-  background-color: #ffd98e;
-  color: #3a1f0b;
-  transform: translateY(-2px);
-  box-shadow: 0 6px #8b5a2b;
+#StartButton:hover,
+#ResetGame:hover {
+    transition: all 0.1s ease-in-out;
+    background-color: #ffd98e;
+    color: #3a1f0b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px #8b5a2b;
 }
 
-#StartButton:active, #ResetGame:active {
-  background-color: #e6b15e;
-  transform: translateY(2px);
-  box-shadow: 0 2px #8b5a2b;
+#StartButton:active,
+#ResetGame:active {
+    background-color: #e6b15e;
+    transform: translateY(2px);
+    box-shadow: 0 2px #8b5a2b;
 }
+
 #Game {
     width: 100%;
     height: 100%;
@@ -98,19 +161,5 @@ html{
     left: 0%;
     bottom: 0%;
     visibility: hidden;
-}
-
-#Floor div {
-    position: absolute;
-    height: 48px;
-    width: 80px;
-    bottom: calc(40% - 39px);
-    left: 15%;
-    background-repeat: repeat-x;
-    transition: width 1s ease-in;
-}
-
-#Floor div.FloorExpanded {
-    width: 200vw;
 }
 

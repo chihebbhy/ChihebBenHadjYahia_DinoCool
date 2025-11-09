@@ -16,12 +16,10 @@ const gameDOM = document.getElementById("Game");
 
 // Constants 
 const g = -1000;    //gravity 
-const BiomeImage = {
-    grass: 'Resources/GreenGrassBlock.png',
-    snow: 'Resources/snowy.png'
-}
-let Floors = [];
-let GameLoopId;
+const BiomeImage = 'Resources/ground.png';
+const floorHeight = 90;
+let floorSpeed = 300;
+let PositionFloor = 0;
 
 
 //fps related variables 
@@ -30,73 +28,7 @@ let fpslimit = 144;
 let interval = 1000 / fpslimit;
 let LastFrameTime = 0;
 let dt = 0;
-
-// our entity class
-class Entity {
-    constructor(EntityId, Name, Image, Velocity) {
-        this.EntityDOM = this.CreateEntity(EntityId, Image);
-        this.Name = Name;
-        this.PositionBottom = parseInt(window.getComputedStyle(this.EntityDOM).bottom);
-        this.PositionTop = parseInt(window.getComputedStyle(this.EntityDOM).bottom) + parseInt(window.getComputedStyle(this.EntityDOM).height);
-        this.PositionLeft = parseInt(window.getComputedStyle(this.EntityDOM).left);
-        this.PositionRight = parseInt(window.getComputedStyle(this.EntityDOM).left) + parseInt(window.getComputedStyle(this.EntityDOM).width);
-        this.Velocity = Velocity;
-
-    }
-    CreateEntity(EntityId, Image) {
-        var entity = document.createElement("div");
-        entity.setAttribute("id", EntityId);
-        entity.style.backgroundImage = `url("${Image}")`;
-        if (EntityId.includes("Floor")) {
-            document.getElementById("Floor").appendChild(entity);
-        } else {
-            document.getElementById("Enemies").appendChild(entity);
-        }
-        return entity;
-    }
-    Deconstruct() {
-        this.EntityDOM.parentNode.removeChild(this.EntityDOM);
-        this.Name = null;
-        this.PositionBottom = null;
-        this.PositionLeft = null;
-        this.PositionRight = null;
-        this.PositionTop = null;
-        this.Velocity = null;
-
-    }
-}
-
-// our floor class
-class Floor extends Entity {
-    constructor(Name, Image, Velocity) {
-        super(Name, Name, Image, Velocity);
-    }
-    reload() {              // to fix the zoom bug
-        const css = window.getComputedStyle(this.EntityDOM);
-        this.PositionBottom = parseInt(css.bottom);
-        this.PositionTop = parseInt(css.bottom) + parseInt(css.height);
-        this.PositionLeft = parseInt(css.left);
-        this.PositionRight = parseInt(css.left) + parseInt(css.width);
-    }
-    ChangeImage(newImage) { // for different biomes
-        this.EntityDOM.style.backgroundImage = `  url("${newImage}")  `;
-    }
-    ExpandFloor() {                 // for the animation when starting the game
-        this.EntityDOM.classList.add("FloorExpanded");
-        setTimeout(() => {          // tna7i el class ejdid ama trod el width 200vw  for cleaner css
-            this.EntityDOM.classList.remove("FloorExpanded");
-            this.EntityDOM.style.width = "200vw";
-            this.EntityDOM.style.transition = "";
-        }, 1000);
-    }
-    MoveFloor(seconds){
-        this.PositionLeft -= this.Velocity*seconds;
-        this.PositionRight -= this.PositionLeft +  this.EntityDOM.offsetWidth;
-        this.EntityDOM.style.left = this.PositionLeft + "px"
-        
-    }
-
-};
+let GameLoopId;
 
 // our player
 let Player = {
@@ -116,12 +48,21 @@ let Player = {
         this.PositionRight = parseInt(PlayerCSS.left) + parseInt(PlayerCSS.width);
 
     },
-    ApplyPhysics(seconds){
+    ApplyPhysics(seconds) {
         this.Velocity += g * seconds;
         this.PositionBottom += Player.Velocity * seconds;
+        if (this.PositionBottom - floorHeight <= 0) {
+            this.PositionBottom = floorHeight;
+            this.Velocity = 0;
+            this.OnGround = true;
+            playerDOM.classList.remove("JumpAndRotate");
+            if (!playerDOM.classList.contains("Standing")) {
+                playerDOM.classList.add("Standing");
+            }
+        }
     },
-    AddScore(toAdd){
-        this.Score += toAdd ;
+    AddScore(toAdd) {
+        this.Score += toAdd;
     }
 };
 
@@ -144,28 +85,22 @@ function HideMenuAndShowGame(ok) {
     }
 }
 
-
+// floor scrolling
+function UpdateFloor(seconds) {
+    PositionFloor -= floorSpeed * seconds;
+    if (PositionFloor < -2304) {
+        PositionFloor += 2304;
+    }
+    floorDOM.style.backgroundPositionX = PositionFloor + "px";
+}
 
 // runs each frame
 function UpdateGame(dt) {
     // calcul physique
     const seconds = dt / 1000;
-    for (const f of Floors){
-        f.MoveFloor(seconds);
-        f.reload();
-    }
     Player.ApplyPhysics(seconds);
-    Player.AddScore(seconds*10); // 10 score par seconde
-    for (const f of Floors) {
-        if (isColliding(Player, f)) {          // collision detection
-            Player.PositionBottom = f.PositionTop;
-            Player.Velocity = 0;
-            if (!Player.OnGround) {
-                Player.OnGround = true;
-                playerDOM.classList.remove("JumpAndRotate");
-            }
-        }
-    }
+    UpdateFloor(seconds);
+    Player.AddScore(seconds * 10); // 10 score par seconde
     playerDOM.style.bottom = Player.PositionBottom + "px";    // For player jumping 
     scoreDOM.innerHTML = 'Score: ' + String(Math.round(Player.Score)).padStart(5, '0'); // Score 
 }
@@ -190,95 +125,114 @@ function GameLoop(TimeStamp) {
 
 
 function StartGame() {
+    // hide start button
     const btn = document.getElementById("StartButton");
     btn.style.display = "none";
     btn.disabled = true;
     btn.blur();
+
+    // show menu button
     const btn2 = document.getElementById("ResetGame");
     btn2.style.display = "block";
-    btn2.disabled = false;  
+    btn2.disabled = false;
+
+
     HideMenuAndShowGame(true);
+    floorDOM.style.backgroundImage = `url("${BiomeImage}")`;
     Player.Score = 0;
     Player.Velocity = 0;
     Player.Ducking = false;
     Player.OnGround = true;
+    Player.PositionBottom = floorHeight;
+    floorSpeed = 300;
+    PositionFloor = 0;
     GameStarted = true;
 
-    //Floor management-----------
-    Floors = [
-        new Floor("Floor1", BiomeImage.grass, 200),
-    ];
-    Floors[0].ExpandFloor();
-    console.log(Floors);
-    //---------------------------
+    console.log(Floor);
     LastFrameTime = performance.now();
+    playerDOM.style.imageSmoothingEnabled = false;
     GameLoopId = GameLoop(0);
 
 }
 
 // Restart 
 function ResetGame() {
-    //for (const enemy of Enemies) {enemy.Deconstruct()};
-    //Enemies = [];
-    for (const floor of Floors) { floor.Deconstruct(); }
-    Floors = [];
+    cancelAnimationFrame(GameLoopId);
+    GameStarted = false;
     HideMenuAndShowGame(false);
+
     const btn = document.getElementById("StartButton");
     btn.style.display = "block";
     btn.disabled = false;
-    
-    document.getElementById("ResetGame").style.display = "none";
-    document.getElementById("ResetGame").disabled = true;
-    document.getElementById("ResetGame").blur();
+
+    const btn2 = document.getElementById("ResetGame");
+    btn2.style.display = "none";
+    btn2.disabled = true;
+    btn2.blur();
 
     Player.Score = 0;
     Player.Velocity = 0;
     Player.PositionBottom = 0;
-
-    GameStarted = false;
+    playerDOM.style.bottom = floorHeight + "px";
 }
 
 
 
-// zooming or resizing window (khatr lzoom kent tbuggi)
-window.addEventListener('resize', function (event) {
-    for (const f of Floors) {
-        f.reload();
+// prevent zooming
+document.addEventListener('wheel', function (e) {
+    if (e.ctrlKey || e.metaKey) { // Ctrl for Windows/Linux, Cmd for macOS
+        e.preventDefault();
     }
-    Player.reload();
-    if (Player.OnGround && Floors.length > 0) {
-        Player.PositionBottom = Floors[0].PositionTop;
-    }
+},
+    { passive: false }
+);
 
-})
 
 // to jump or duck
 document.addEventListener('keydown', function (event) {
+    if ((event.ctrlKey || event.metaKey) && (event.key === '+' || event.key === '-' || event.key === '=' || event.key === '0')) {
+        event.preventDefault();
+    }; // prevent zooming
+    console.log(event.code);
     if (GameStarted) {
         var key = event.key;
         var code = event.code;
-        console.log(playerDOM.classList);
+        console.log(code);
         if (code == "Space") {
-            // ynagz* 
+            // ynagz
             if (Player.OnGround == true) {
-                Player.Velocity = 650; // valeur 3ejbetni
+                Player.Velocity = 800; // valeur 3ejbetni
                 Player.OnGround = false;
-                playerDOM.classList.add("JumpAndRotate");
-            }
-        }else{
-            if(code == "ArrowDown"){
-                //duck
-                if(Player.OnGround == true){
-                    playerDOM.classList.add("Duck");
+                if (playerDOM.classList.contains("Duck")) {
+                    playerDOM.classList.remove("Duck");
+                }
+                if (playerDOM.classList.contains("Standing")) {
                     playerDOM.classList.remove("Standing");
                 }
-            }else{
-                if(playerDOM.classList.contains("Duck")){
-                    playerDOM.classList.remove("Duck");
-                    playerDOM.classList.add("Standing");
+
+                playerDOM.classList.add("JumpAndRotate");
+            }
+        } else {
+            if (code == "ArrowDown") {
+                //duck
+                if (Player.OnGround == true) {
+                    Player.Ducking = true;
+                    playerDOM.classList.add("Duck");
+                    if (playerDOM.classList.contains("Standing")) {
+                        playerDOM.classList.remove("Standing");
+                    }
                 }
             }
         }
+    }
+}
+)
+
+document.addEventListener('keyup', function (event) {
+    if (Player.Ducking && event.code == "ArrowDown") {
+        Player.Ducking = false;
+        playerDOM.classList.remove("Duck");
+        playerDOM.classList.add("Standing");
     }
 }
 )
