@@ -5,21 +5,28 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Game</title>
         <link rel="stylesheet" href="index.css">
-        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur9.png" as="image">
-        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur10.png" as="image">
-        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur11.png" as="image">
-        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur12.png" as="image">
-        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur13.png" as="image">
-        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur14.png" as="image">
-        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur15.png" as="image">
-
-
+ <!--       <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur9.png"
+            as="image">
+        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur10.png"
+            as="image">
+        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur11.png"
+            as="image">
+        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur12.png"
+            as="image">
+        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur13.png"
+            as="image">
+        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur14.png"
+            as="image">
+        <link rel="preload" href="Resources/Dino/Dino/RedDino/RedDinosaur15.png"
+            as="image">
+-->
     </head>
     <body>
+        <video autoplay muted loop id="Video">
+            <source src="Resources/Extra/background.mp4" type="video/mp4">
+        </video>
         <div id="Menu">
-            <video autoplay muted loop id="Video">
-                <source src="Resources/background.mp4" type="video/mp4">
-            </video>
+
             <section name="Title" id="Title">
                 DinoCool
             </section>
@@ -34,19 +41,25 @@
 
         </div>
         <section name="Game" id="Game">
-            <video autoplay muted loop id="Video">
-                <source src="Resources/background.mp4" type="video/mp4">
-            </video>
+            <div id="Background1" class="Background"></div>
+            <div id="Background2" class="Background"></div>
+            <div id="Background3" class="Background"></div>
+            <div id="Background4" class="Background"></div>
+            <div id="Background5" class="Background"></div>
             <button onclick="ResetGame()" id="ResetGame">Menu </button>
             <div name="Score" id="Score">
                 Score: 00000
             </div>
-            <div name="Player" id="Player" class="Standing"></div>
+            <div name="Player" id="Player" class="Standing">
+                <div name="PlayerHitBox" id="PlayerHitBox" class="Standing"> </div>
+                <div name="PlayerSprite" id="PlayerSprite" class="Standing"></div>
+
+            </div>
             <div id="Enemies">
 
             </div>
-            <div id="Floor" name="Floor">   
-                
+            <div id="Floor" name="Floor">
+
             </div>
         </section>
         <script src="index.js"></script>

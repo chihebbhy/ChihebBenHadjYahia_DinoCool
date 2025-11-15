@@ -1,28 +1,37 @@
 // Bugs to fix : 
-// when restarting GameLoop keeps running and player falls
+// zooming out shows the 
 // Animation t3 kolchy
-
+// HitBox is off when jumping 
+//
 // Features to add :
 // Biomes.
 // More speed over time
+// Faster fall speed to look better
+// Parallax background
+// Enemies
+// Trees, flowers ..
 
 
 // DOMs 
-const playerDOM = document.getElementById("Player");
+const playerSpriteDOM = document.getElementById("PlayerSprite");
+const playerHitBoxDOM = document.getElementById("PlayerHitBox");
 const floorDOM = document.getElementById("Floor");
 const scoreDOM = document.getElementById("Score");
 const menuDOM = document.getElementById("Menu");
 const gameDOM = document.getElementById("Game");
+const BackgroundsDOM = document.getElementsByClassName("Background");
 
 // Constants 
-const g = -1000;    //gravity 
-const BiomeImage = 'Resources/ground.png';
-const floorHeight = 90;
-let floorSpeed = 300;
-let PositionFloor = 0;
+const g = -1000;                                     // gravity 
+const BiomeImage = 'Resources/Extra/ground.png';     // biomes 
+const floorHeight = 90;                              // self explanatory 
+let floorSpeed = 300;                                // the speed that the floor goes by at
+let PositionFloor = 0;                               // used to make the floor scroll by 
+const speeds = [0, 50, 130, 200, 300];               // different speeds for different backgrounds
+let backgroundOffsets = [0, 0, 0, 0, 0];             // backgrounds offsets
 
 
-//fps related variables 
+// fps related variables 
 let GameStarted = false;
 let fpslimit = 144;
 let interval = 1000 / fpslimit;
@@ -32,16 +41,16 @@ let GameLoopId;
 
 // our player
 let Player = {
-    PositionBottom: parseInt(window.getComputedStyle(playerDOM).bottom), // position bl bottom
-    PositionTop: parseInt(window.getComputedStyle(playerDOM).bottom) + parseInt(window.getComputedStyle(playerDOM).height), // position top = bottom + kobr tswire(height)
-    PositionLeft: parseInt(window.getComputedStyle(playerDOM).left),
-    PositionRight: parseInt(window.getComputedStyle(playerDOM).left) + parseInt(window.getComputedStyle(playerDOM).width),
+    PositionBottom: parseInt(window.getComputedStyle(playerHitBoxDOM).bottom), // position bl bottom
+    PositionTop: parseInt(window.getComputedStyle(playerHitBoxDOM).bottom) + parseInt(window.getComputedStyle(playerHitBoxDOM).height), // position top = bottom + kobr tswire(height)
+    PositionLeft: parseInt(window.getComputedStyle(playerHitBoxDOM).left),
+    PositionRight: parseInt(window.getComputedStyle(playerHitBoxDOM).left) + parseInt(window.getComputedStyle(playerHitBoxDOM).width),
     Velocity: 0,
     Ducking: false,
     OnGround: true,
     Score: 0,
     reload() {
-        var PlayerCSS = window.getComputedStyle(playerDOM);
+        var PlayerCSS = window.getComputedStyle(playerHitBoxDOM);
         this.PositionBottom = parseInt(PlayerCSS.bottom);
         this.PositionTop = parseInt(PlayerCSS.bottom) + parseInt(PlayerCSS.height);
         this.PositionLeft = parseInt(PlayerCSS.left);
@@ -51,19 +60,27 @@ let Player = {
     ApplyPhysics(seconds) {
         this.Velocity += g * seconds;
         this.PositionBottom += Player.Velocity * seconds;
-        if (this.PositionBottom - floorHeight <= 0) {
+        if (this.PositionBottom <= floorHeight) {
             this.PositionBottom = floorHeight;
             this.Velocity = 0;
             this.OnGround = true;
-            playerDOM.classList.remove("JumpAndRotate");
-            if (!playerDOM.classList.contains("Standing")) {
-                playerDOM.classList.add("Standing");
+            playerSpriteDOM.classList.remove("JumpAndRotate");
+            playerHitBoxDOM.classList.remove("JumpAndRotate");
+            if (!playerSpriteDOM.classList.contains("Standing") && !Player.Ducking) {
+                playerSpriteDOM.classList.add("Standing");
+                playerHitBoxDOM.classList.add("Standing");
             }
         }
+        this.updateVisuals();
+
     },
     AddScore(toAdd) {
         this.Score += toAdd;
-    }
+    },
+    updateVisuals() {
+        playerHitBoxDOM.style.bottom = this.PositionBottom + 20 + "px"; // 20 mta3 hitbox bch ykoun wst sprite
+        playerSpriteDOM.style.bottom = this.PositionBottom + "px";
+    },
 };
 
 // test if a and b collide based on them .Position
@@ -94,26 +111,43 @@ function UpdateFloor(seconds) {
     floorDOM.style.backgroundPositionX = PositionFloor + "px";
 }
 
+// Run Parallax Backgrounds 
+function UpdateBackground(seconds) {
+    for (var i = 0; i < BackgroundsDOM.length; i++) {
+        backgroundOffsets[i] -= speeds[i] * seconds; // speed
+
+        //remove excess position 
+        var n = window.innerWidth;
+        while (backgroundOffsets[i] <= -n) {
+            backgroundOffsets[i] += n;
+        }
+        BackgroundsDOM[i].style.backgroundPositionX = backgroundOffsets[i] + "px";
+    }
+
+}
+
 // runs each frame
 function UpdateGame(dt) {
     // calcul physique
     const seconds = dt / 1000;
     Player.ApplyPhysics(seconds);
     UpdateFloor(seconds);
+    UpdateBackground(seconds);
     Player.AddScore(seconds * 10); // 10 score par seconde
-    playerDOM.style.bottom = Player.PositionBottom + "px";    // For player jumping 
     scoreDOM.innerHTML = 'Score: ' + String(Math.round(Player.Score)).padStart(5, '0'); // Score 
 }
 
 
 // loop tcontrolli lframes bch mayfoutouch 144 fps w maydhay3ouch frames 
 function GameLoop(TimeStamp) {
+    if (!GameStarted) return;
     if (TimeStamp < (LastFrameTime + interval)) {
         requestAnimationFrame(GameLoop);
         return;
     }
     dt += TimeStamp - LastFrameTime;
     LastFrameTime = TimeStamp;
+    if (dt >= interval * 100) dt = 0;
     while (dt >= interval) {
         // trajja3 eli je retard 
         UpdateGame(interval);
@@ -147,10 +181,8 @@ function StartGame() {
     floorSpeed = 300;
     PositionFloor = 0;
     GameStarted = true;
-
-    console.log(Floor);
     LastFrameTime = performance.now();
-    playerDOM.style.imageSmoothingEnabled = false;
+    playerSpriteDOM.style.imageSmoothingEnabled = false; // idkkkkkkkkkkkkkkkkkkkkkkkkkkkk
     GameLoopId = GameLoop(0);
 
 }
@@ -172,67 +204,52 @@ function ResetGame() {
 
     Player.Score = 0;
     Player.Velocity = 0;
-    Player.PositionBottom = 0;
-    playerDOM.style.bottom = floorHeight + "px";
+    Player.PositionBottom = floorHeight;
+    Player.updateVisuals();
 }
-
-
-
-// prevent zooming
-document.addEventListener('wheel', function (e) {
-    if (e.ctrlKey || e.metaKey) { // Ctrl for Windows/Linux, Cmd for macOS
-        e.preventDefault();
-    }
-},
-    { passive: false }
-);
-
 
 // to jump or duck
 document.addEventListener('keydown', function (event) {
-    if ((event.ctrlKey || event.metaKey) && (event.key === '+' || event.key === '-' || event.key === '=' || event.key === '0')) {
-        event.preventDefault();
-    }; // prevent zooming
-    console.log(event.code);
-    if (GameStarted) {
-        var key = event.key;
-        var code = event.code;
-        console.log(code);
-        if (code == "Space") {
-            // ynagz
-            if (Player.OnGround == true) {
-                Player.Velocity = 800; // valeur 3ejbetni
-                Player.OnGround = false;
-                if (playerDOM.classList.contains("Duck")) {
-                    playerDOM.classList.remove("Duck");
-                }
-                if (playerDOM.classList.contains("Standing")) {
-                    playerDOM.classList.remove("Standing");
-                }
+    if (!GameStarted || event.repeat) return;
+    var key = event.key;
+    var code = event.code;
+    if (code == "Space") {
+        // ynagz
+        if (Player.OnGround) {
+            Player.Velocity = 800; // valeur 3ejbetni
+            Player.OnGround = false;
+            playerSpriteDOM.classList.remove("Duck", "Standing");
+            playerSpriteDOM.classList.add("JumpAndRotate");
+            playerHitBoxDOM.classList.remove("Duck", "Standing");
+            playerHitBoxDOM.classList.add("JumpAndRotate");
+        }
 
-                playerDOM.classList.add("JumpAndRotate");
-            }
-        } else {
-            if (code == "ArrowDown") {
-                //duck
-                if (Player.OnGround == true) {
-                    Player.Ducking = true;
-                    playerDOM.classList.add("Duck");
-                    if (playerDOM.classList.contains("Standing")) {
-                        playerDOM.classList.remove("Standing");
-                    }
-                }
-            }
+
+    }
+    if (code == "ArrowDown") {
+        //duck
+        if (Player.OnGround && !Player.Ducking) {
+            Player.Ducking = true;
+            playerSpriteDOM.classList.add("Duck");
+            playerSpriteDOM.classList.remove("Standing");
+            playerHitBoxDOM.classList.add("Duck");
+            playerHitBoxDOM.classList.remove("Standing");
+
         }
     }
 }
 )
 
+
+
+
 document.addEventListener('keyup', function (event) {
     if (Player.Ducking && event.code == "ArrowDown") {
         Player.Ducking = false;
-        playerDOM.classList.remove("Duck");
-        playerDOM.classList.add("Standing");
+        playerSpriteDOM.classList.remove("Duck");
+        playerSpriteDOM.classList.add("Standing");
+        playerHitBoxDOM.classList.remove("Duck");
+        playerHitBoxDOM.classList.add("Standing");
     }
 }
 )

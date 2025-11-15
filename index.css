@@ -1,57 +1,93 @@
+/*
+ Z INDEX LIST:
+    10      All buttons and Score
+    9       Floor 
+    8       Player
+    7       Enemies
+    6       Decor ( trees )
+    5 -> 1  Background ( 5 different backgrounds )  parallax 
+
+
+*/
+
 @font-face {
     font-family: 'MyFont';
-    src: url('Resources/font.otf') format('truetype');
+    src: url('Resources/Extra/font.otf') format('truetype');
 }
 
 html {
     user-select: none;
     overflow: hidden;
-    
     image-rendering: pixelated;
 }
 
 /* -----------------Player----------------- */
+#Player{
+    background-color: aqua;
+    z-index: 8 ;
 
-#Player {
+}
+
+#PlayerHitBox{
+    position: absolute;
+    bottom: calc(90px + 20px); /* 96px is the ground's height */
+    left: calc(15% + 63px);
+}
+#PlayerHitBox.Standing {
+    height: calc(40px * 2.5);  
+    width: calc(60px * 3.2);   
+}
+#PlayerHitBox.JumpAndRotate{
+    height: calc(40px * 2.5);  
+    width: calc(60px * 3.2);   
+    transition: transform 1.4s ease-out;
+    transform: rotate(360deg);
+}
+#PlayerSprite{
     position: absolute;
     bottom: 96px;
-    left: 15%;
+    left: 15%; 
+    background-position: center bottom;
+    background-repeat: no-repeat;
     background-size: cover;
-    z-index: 5;
-    overflow: hidden;
+    z-index: 8;
+
 }
 
-.Standing {
-    height: calc(28px * 5);  
-    width: calc(32px * 5);   
-    animation: run 1s infinite ;
+#PlayerSprite.Standing {
+    height: calc(40px * 5.5);  
+    width: calc(60px * 5.5);   
+    animation: run 3s infinite ;
 }
 
-.JumpAndRotate {
-    background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur1.png");
-        height: calc(28px * 5);  
-    width: calc(32px * 5); 
+#PlayerSprite.JumpAndRotate {
+    background-image: url("Resources/Cloud/Running/CloudRunningFrame1.png");
+    height: calc(40px * 5.5);  
+    width: calc(60px * 5.5);   
     transition: transform 1.4s ease-out;
     transform: rotate(360deg) ;
 }
 
 .Duck {
-    background-image: url("Resources/pixil-frame-0\ \(4\).png");
-    width: calc(35px * 4.5); /* 135 */
-    height: calc(18px * 4.5) ; /* 63 */
-    animation: none;
+    width: calc(35px * 6.8); 
+    height: calc(18px * 6.8) ; 
+    animation: startduck 5.4s both;
 
 
 }
 
+@keyframes startduck {
+    0% , 40% {background-image: url("Resources/Frames/Crouching (faceless)/CrouchRunningFrame1.png");}
+    41% , 80% {background-image: url("Resources/Frames/Crouching (faceless)/CrouchRunningFrame2.png");}
+    81% , 100% {background-image: url("Resources/DuckingFrame3.png");}
+
+}
 @keyframes run {
-    0% , 13% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur9.png");}
-    14% , 27% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur10.png");}
-    28% , 41% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur11.png");}
-    42% , 55% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur12.png");}
-    56% , 70% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur13.png");}
-    71% , 85% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur14.png");}
-    86% , 100% {background-image: url("Resources/Dino/Dino/RedDino/RedDinosaur15.png");}
+    0%,24%{background-image: url("Resources/Cloud/Running/NewRunningFrame1.png");}
+    25%,49% {background-image: url("Resources/Cloud/Running/NewRunningFrame3.png");}
+    50%,74% {background-image: url("Resources/Cloud/Running/NewRunningFrame2.png");}
+    75%,100% {background-image: url("Resources/Cloud/Running/NewRunningFrame4.png");}
+
 }
 
 /* --------------------FLOOR------------------------- */
@@ -60,12 +96,12 @@ html {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: calc(2304px );
+    width: calc(2304px * 5 );
     height: calc(96px);
     background-repeat: repeat-x;
     background-size: contain;
     background-position-x: 0;
-    z-index: 10;
+    z-index: 9;
 }
 
 #Floor div.FloorExpanded {
@@ -87,16 +123,51 @@ html {
     border-radius: 8px;    
     font-family: 'Myfont','Courier New', Courier, monospace;
     text-align: left;
+    z-index: 10;
+
 }
 
-/* ----------------------------------------------------- */
+/* -----------------------Backrgound---------------------- */
+
+.Background{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    min-height: 100%;
+    min-width: 100%;
+    background-repeat: repeat-x;
+    background-size: cover;
+    background-position-x: 0;
+
+} 
+#Background1{
+    background-image: url("Resources/Extra/Parallax Background/plx-1.png");
+    z-index: 1;
+}
+#Background2{
+    background-image: url("Resources/Extra/Parallax Background/plx-2.png");
+    z-index: 2;
+}
+#Background3{
+    background-image: url("Resources/Extra/Parallax Background/plx-3.png");
+    z-index: 3;
+}
+#Background4{
+    background-image: url("Resources/Extra/Parallax Background/plx-4.png");
+    z-index: 4;
+}
+#Background5{
+    background-image: url("Resources/Extra/Parallax Background/plx-5.png");
+    z-index: 5;}
+/* ------------------------------------------------------ */
 #Video {
     position: fixed;
     right: 0px;
     top: 0px;
     min-height: 100%;
     min-width: 100%;
-    z-index: -1;
+    z-index: 0;
+
 }
 
 #Menu {
@@ -116,6 +187,7 @@ html {
 
 #Title {
     font-size: 6.25rem;
+    z-index: 10;
 }
 
 #StartButton,
@@ -130,12 +202,13 @@ html {
     letter-spacing: 1px;
     cursor: pointer;
     box-shadow: 0 4px #8b5a2b;
+    z-index: 10;
 }
 
 #ResetGame {
     position: absolute;
     right: 20px;
-    top: 20px;
+    top: 20px;  
 }
 
 #StartButton:hover,
