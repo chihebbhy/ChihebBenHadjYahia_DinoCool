@@ -7,9 +7,11 @@
 // Biomes.
 // More speed over time
 // Faster fall speed to look better
-// Parallax background
-// Enemies
+// Enemies #ON GOING
 // Trees, flowers ..
+// Fix restarting (reset everything)
+// Preloading
+
 
 
 // DOMs 
@@ -25,7 +27,7 @@ const BackgroundsDOM = document.getElementsByClassName("Background");
 const g = -1000;                                     // gravity 
 const BiomeImage = 'Resources/Extra/ground.png';     // biomes 
 const floorHeight = 90;                              // self explanatory 
-let floorSpeed = 300;                                // the speed that the floor goes by at
+let floorSpeed = 300;                              // the speed that the floor goes by at
 let PositionFloor = 0;                               // used to make the floor scroll by 
 const speeds = [0, 50, 130, 200, 300];               // different speeds for different backgrounds
 let backgroundOffsets = [0, 0, 0, 0, 0];             // backgrounds offsets
@@ -33,11 +35,37 @@ let backgroundOffsets = [0, 0, 0, 0, 0];             // backgrounds offsets
 
 // fps related variables 
 let GameStarted = false;
-let fpslimit = 144;
-let interval = 1000 / fpslimit;
+const fpslimit = 144;
+const interval = 1000 / fpslimit;
 let LastFrameTime = 0;
 let dt = 0;
 let GameLoopId;
+
+// enemy spawning variables
+let spawnTimer = 0
+let CurrentEnemies = [];
+let minSpawnDelay = 3;
+let nextSpawnTime = 3;
+const EnemyTypes = [                                 // different types of enemies
+    {
+        name: "SmallCactus",
+        image: "",
+        Speed: 300,
+        weight: 5,
+    },
+    {
+        name: "LargeCactus",
+        image: "",
+        Speed: 300,
+        weight: 3,
+    },
+    {
+        name: "Bird",
+        image: "",
+        Speed: 300,
+        weight: 2,
+    }
+];
 
 // our player
 let Player = {
@@ -83,6 +111,44 @@ let Player = {
     },
 };
 
+class Enemies {
+    constructor(type) {
+        this.Type = type;
+        this.Velocity = type.Speed;
+        this.Collided = false;
+        // Create div in html
+        this.DOM = document.createElement("div");
+        this.DOM.className = "Enemy " + type.name;
+        document.getElementById("Enemies").appendChild(this.DOM);
+
+        const css = window.getComputedStyle(this.DOM);
+
+        this.x = window.innerWidth;
+        this.y = floorHeight;
+
+        this.DOM.style.left = this.x + "px";
+        this.DOM.style.bottom = this.y + "px";
+
+    }
+    update(seconds) {
+        this.x -= this.Velocity * seconds;
+        this.DOM.style.left = this.x + "px";
+        const css = window.getComputedStyle(this.DOM);
+        this.PositionLeft = parseInt(css.left);
+        this.PositionRight = this.PositionLeft + parseInt(css.width);
+        this.PositionBottom = parseInt(css.bottom);
+        this.PositionTop = this.PositionBottom + parseInt(css.height);
+    }
+    destructor() {
+        if (this.DOM.parentNode && this.DOM) {
+            this.DOM.parentNode.removeChild(this.DOM);
+        }
+        this.DOM = null;
+    }
+
+}
+
+
 // test if a and b collide based on them .Position
 function isColliding(a, b) {
     return !(a.PositionRight < b.PositionLeft ||
@@ -126,6 +192,44 @@ function UpdateBackground(seconds) {
 
 }
 
+// Chooses which type of enemy to spawn based on their weights 
+function getRandomEnemyType() {
+    let totalWeight = EnemyTypes.reduce((s, e) => s + e.weight, 0); // reduce t3addi lfct hedhika 3la kol element wl s hia somme wl e howa el element eli 9a3da tet3ada 3lih lfct
+    let r = Math.random() * totalWeight;
+
+    for (let e of EnemyTypes) {
+        if (r < e.weight) return e;
+        r -= e.weight;
+    }
+}
+
+// spawns and moves enemies 
+function UpdateAndSpawnEnemies(seconds) {
+    spawnTimer += seconds;
+    if (spawnTimer >= nextSpawnTime) {
+        spawnTimer = 0;
+        nextSpawnTime = minSpawnDelay + Math.random() * minSpawnDelay;
+
+        var type = getRandomEnemyType();
+
+        CurrentEnemies.push(new Enemies(type));
+    }
+
+    // move the already existing enemies
+    for (let i = 0; i < CurrentEnemies.length; i++) {
+        let e = CurrentEnemies[i];
+        e.update(seconds);
+        if (e.x < -200) {
+            e.destructor();
+            CurrentEnemies.splice(i, 1); // at position i remove 1 element 
+        }
+        if(!e.Collided && isColliding(e,Player) ){
+            e.Collided = true;
+            console.log("hit!");
+        }
+    }
+}
+
 // runs each frame
 function UpdateGame(dt) {
     // calcul physique
@@ -133,6 +237,7 @@ function UpdateGame(dt) {
     Player.ApplyPhysics(seconds);
     UpdateFloor(seconds);
     UpdateBackground(seconds);
+    UpdateAndSpawnEnemies(seconds);
     Player.AddScore(seconds * 10); // 10 score par seconde
     scoreDOM.innerHTML = 'Score: ' + String(Math.round(Player.Score)).padStart(5, '0'); // Score 
 }
