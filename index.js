@@ -1,12 +1,9 @@
 // Bugs to fix : 
-// zooming out shows the 
 // Animation t3 kolchy
 // HitBox is off when jumping 
 //
 // Features to add :
 // Biomes.
-// More speed over time
-// Faster fall speed to look better
 // Enemies #ON GOING
 // Trees, flowers ..
 // Fix restarting (reset everything)
@@ -22,16 +19,20 @@ const scoreDOM = document.getElementById("Score");
 const menuDOM = document.getElementById("Menu");
 const gameDOM = document.getElementById("Game");
 const BackgroundsDOM = document.getElementsByClassName("Background");
-
+const DeathDOM = document.getElementById("DeathAnimation");
 // Constants 
-const g = -1000;                                     // gravity 
+const g = -1000;
+let gfall = g * 1.5;                               // gravity 
 const BiomeImage = 'Resources/Extra/ground.png';     // biomes 
 const floorHeight = 90;                              // self explanatory 
-let floorSpeed = 300;                              // the speed that the floor goes by at
+let floorSpeed = 300;                                // the speed that the floor goes by at
 let PositionFloor = 0;                               // used to make the floor scroll by 
 const speeds = [0, 50, 130, 200, 300];               // different speeds for different backgrounds
+const speedsDefault = [0, 50, 130, 200, 300];        //       
 let backgroundOffsets = [0, 0, 0, 0, 0];             // backgrounds offsets
 
+// Score
+let previousScoreDivision = 0;
 
 // fps related variables 
 let GameStarted = false;
@@ -76,6 +77,7 @@ let Player = {
     Velocity: 0,
     Ducking: false,
     OnGround: true,
+    Dead: false,
     Score: 0,
     reload() {
         var PlayerCSS = window.getComputedStyle(playerHitBoxDOM);
@@ -86,7 +88,11 @@ let Player = {
 
     },
     ApplyPhysics(seconds) {
-        this.Velocity += g * seconds;
+        if (this.Velocity > 0) {
+            this.Velocity += g * seconds;
+        } else {
+            this.Velocity += gfall * seconds; // faster fall velocity
+        }
         this.PositionBottom += Player.Velocity * seconds;
         if (this.PositionBottom <= floorHeight) {
             this.PositionBottom = floorHeight;
@@ -104,6 +110,7 @@ let Player = {
     },
     AddScore(toAdd) {
         this.Score += toAdd;
+        UpdateSpeeds(this.Score);
     },
     updateVisuals() {
         playerHitBoxDOM.style.bottom = this.PositionBottom + 20 + "px"; // 20 mta3 hitbox bch ykoun wst sprite
@@ -184,10 +191,12 @@ function UpdateBackground(seconds) {
 
         //remove excess position 
         var n = window.innerWidth;
-        while (backgroundOffsets[i] <= -n) {
+        while (backgroundOffsets[i] <= -384) { // 384 is the width of the background image
             backgroundOffsets[i] += n;
         }
+
         BackgroundsDOM[i].style.backgroundPositionX = backgroundOffsets[i] + "px";
+
     }
 
 }
@@ -223,23 +232,76 @@ function UpdateAndSpawnEnemies(seconds) {
             e.destructor();
             CurrentEnemies.splice(i, 1); // at position i remove 1 element 
         }
-        if(!e.Collided && isColliding(e,Player) ){
+        if (!e.Collided && isColliding(e, Player)) {
+            console.log("dead");
             e.Collided = true;
-            console.log("hit!");
+            GameOver();
         }
     }
 }
 
+function GameOver() {
+    Player.Dead = true;
+    Player.Velocity = 300;
+    CurrentEnemies.forEach(element => {
+        element.destructor();  // remove all enemies
+    });
+
+
+    gfall = -500; // slower fall for death animation
+    setTimeout(() => { // first wait for the player to fall
+        gfall = -1500; // reset gravity after animation
+        playerSpriteDOM.classList.remove('Standing', 'JumpAndRotate', 'Duck');
+        playerSpriteDOM.style.animation = "";
+        playerSpriteDOM.style.backgroundImage = 'url("Resources/Cloud/Cloud.png") !important';
+        playerSpriteDOM.style.zIndex = 1000;
+        setTimeout(() => { // second wait to start death animation 
+
+            DeathDOM.classList.add("Start");
+            playerSpriteDOM.classList.add("Death"); 
+                DeathDOM.style.opacity = "1";
+
+        }, 1000) // time to start animating
+    }, 1500); 
+// change the settimeouts to a promise to make it cleaner
+//
+// finally show menu after death animation 
+}
+
+function UpdateSpeeds(Score) {
+    var u = Math.floor(Score / 100);
+    if (u > previousScoreDivision) {
+        floorSpeed = 300 + u * 20; // floor: starts at 300 and adds 20 speed every 100 score (10 seconds)
+        if (u < 25) {
+            minSpawnDelay = 3 - u * 0.1;// enemyspawning: starts at 3 seconds and reduces 0.1 every 100 score 
+        } else {
+            minSpawnDelay = 0.5;
+        }
+        for (let i = speeds.length - 1; i >= 0; i--) {
+            speeds[i] = speedsDefault[i] + u * (20 - (5 * (speeds.length - i))); // backgroundspeeds: add 20 to the closest background, 15 to the one after it , 10 after it....
+        }
+        EnemyTypes.forEach(enemy => {
+            enemy.Speed = 300 + u * 20;  // enemyspeeds: add 20 speed to each enemy
+        });
+        previousScoreDivision = u;
+    }
+
+}
 // runs each frame
 function UpdateGame(dt) {
     // calcul physique
     const seconds = dt / 1000;
-    Player.ApplyPhysics(seconds);
-    UpdateFloor(seconds);
-    UpdateBackground(seconds);
-    UpdateAndSpawnEnemies(seconds);
-    Player.AddScore(seconds * 10); // 10 score par seconde
-    scoreDOM.innerHTML = 'Score: ' + String(Math.round(Player.Score)).padStart(5, '0'); // Score 
+    if (GameStarted) {
+        Player.ApplyPhysics(seconds);
+        if (!Player.Dead) {
+
+            UpdateFloor(seconds);
+            UpdateBackground(seconds);
+            UpdateAndSpawnEnemies(seconds);
+            Player.AddScore(seconds * 10);      // 10 score par seconde
+            scoreDOM.innerHTML = 'Score: ' + String(Math.round(Player.Score)).padStart(5, '0'); // Score 
+        }
+    }
 }
 
 
@@ -358,3 +420,5 @@ document.addEventListener('keyup', function (event) {
     }
 }
 )
+
+

@@ -1,8 +1,9 @@
 /*
  Z INDEX LIST:
+    999      Death Screen Animation // only shows on death
     10      All buttons and Score
     9       Floor 
-    8       Player
+    8       Player  // 900 on death in js
     7       Enemies
     6       Decor ( trees )
     5 -> 1  Background ( 5 different backgrounds )  parallax 
@@ -27,11 +28,11 @@ html {
     z-index: 8 ;
 
 }
-
 #PlayerHitBox{
     position: absolute;
     bottom: calc(90px + 20px); /* 96px is the ground's height */
     left: calc(15% + 63px);
+    z-index: 32;
 }
 #PlayerHitBox.Standing {
     height: calc(40px * 2.5);  
@@ -44,6 +45,7 @@ html {
     transform: rotate(360deg);
 }
 #PlayerSprite{
+    background-image: url("Resources/Cloud/Cloud.png");
     position: absolute;
     bottom: 96px;
     left: 15%; 
@@ -71,11 +73,11 @@ html {
 .Duck {
     width: calc(35px * 6.8); 
     height: calc(18px * 6.8) ; 
-    animation: startduck 5.4s both;
-
-
 }
-
+#PlayerSprite.Death {
+    animation: DeathWalk 5s forwards;
+    position: absolute;
+}
 @keyframes startduck {
     0% , 40% {background-image: url("Resources/Frames/Crouching (faceless)/CrouchRunningFrame1.png");}
     41% , 80% {background-image: url("Resources/Frames/Crouching (faceless)/CrouchRunningFrame2.png");}
@@ -87,6 +89,16 @@ html {
     25%,49% {background-image: url("Resources/Cloud/Running/NewRunningFrame3.png");}
     50%,74% {background-image: url("Resources/Cloud/Running/NewRunningFrame2.png");}
     75%,100% {background-image: url("Resources/Cloud/Running/NewRunningFrame4.png");}
+
+}
+@keyframes DeathWalk {
+    0% {    
+        left : calc(15%) ;
+        bottom : 96px ;    }
+    100% {    
+        left : calc(50% - calc(60px * 5.5) / 2) ;  /* 5.5 is the scale factor */
+        bottom : calc(50% - calc(40px * 5.5) / 2 + 40px) ;  /* 5.5 is the scale factor */
+}
 
 }
 
@@ -119,7 +131,8 @@ html {
     min-width: 270px;
     padding: 8px;
     letter-spacing: 2px;
-    border: 2px solid #8b5a2b;
+    border: 4px solid #8b5a2b;
+    border-bottom: 8px solid #8b5a2b; 
     border-radius: 8px;    
     font-family: 'Myfont','Courier New', Courier, monospace;
     text-align: left;
@@ -131,12 +144,13 @@ html {
 
 .Background{
     position: fixed;
-    bottom: 0;
+    top: 0;
+    bottom: 90px;
     left: 0;
-    min-height: 100%;
-    min-width: 100%;
+    height: 100%;
+    width: 100%;
     background-repeat: repeat-x;
-    background-size: cover;
+    background-size: 100% calc(100% - 90px) ;
     background-position-x: 0;
 
 } 
@@ -257,3 +271,24 @@ html {
     visibility: hidden;
 }
 
+/* -------------------------Death------------------------------- */
+
+#DeathAnimation{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+}
+#DeathAnimation.Start{
+    pointer-events: none;
+    background: darkred;
+    opacity: 0;
+    z-index: 999;
+    animation: opacity 1.5s ;
+}
+@keyframes opacity {
+   from {opacity: 0;} 
+    to{opacity: 1;}
+}   
