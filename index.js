@@ -261,6 +261,7 @@ function UpdateAndSpawnEnemies(seconds) {
 
 async function GameOver() {
     Player.Dead = true;
+    document.getElementById("ResetGame").disabled = true;
     Player.Velocity = 300;
     CurrentEnemies.forEach(element => {
         element.destructor();  // remove all enemies

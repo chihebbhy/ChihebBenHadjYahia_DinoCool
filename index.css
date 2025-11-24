@@ -37,7 +37,6 @@ html {
     bottom: calc(90px + 20px);
     /* 96px is the ground's height */
     left: calc(15% + 63px);
-    background-color: tomato;
     z-index: 32;
 }
 
