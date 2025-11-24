@@ -31,6 +31,7 @@ const g = -1000;
 let gfall = g * 1.5;                               // gravity 
 const BiomeImage = 'Resources/Extra/ground.png';     // biomes 
 const floorHeight = 90;                              // self explanatory 
+const PlayerOffGround = 30;                          // height above the ground when the player is considered off the ground
 let floorSpeed = 300;                                // the speed that the floor goes by at
 let PositionFloor = 0;                               // used to make the floor scroll by 
 const speeds = [0, 50, 130, 200, 300];               // different speeds for different backgrounds
@@ -76,7 +77,7 @@ const EnemyTypes = [                                 // different types of enemi
 
 // our player
 let Player = {
-    PositionBottom: parseInt(window.getComputedStyle(playerHitBoxDOM).bottom), // position bl bottom
+    PositionBottom: parseInt(window.getComputedStyle(playerHitBoxDOM).bottom) , // position bl bottom
     PositionTop: parseInt(window.getComputedStyle(playerHitBoxDOM).bottom) + parseInt(window.getComputedStyle(playerHitBoxDOM).height), // position top = bottom + kobr tswire(height)
     PositionLeft: parseInt(window.getComputedStyle(playerHitBoxDOM).left),
     PositionRight: parseInt(window.getComputedStyle(playerHitBoxDOM).left) + parseInt(window.getComputedStyle(playerHitBoxDOM).width),
@@ -87,7 +88,7 @@ let Player = {
     Score: 0,
     reload() {
         var PlayerCSS = window.getComputedStyle(playerHitBoxDOM);
-        this.PositionBottom = parseInt(PlayerCSS.bottom);
+        this.PositionBottom = parseInt(PlayerCSS.bottom) ; // 20 mta3 hitbox bch ykoun wst sprite
         this.PositionTop = parseInt(PlayerCSS.bottom) + parseInt(PlayerCSS.height);
         this.PositionLeft = parseInt(PlayerCSS.left);
         this.PositionRight = parseInt(PlayerCSS.left) + parseInt(PlayerCSS.width);
@@ -100,8 +101,8 @@ let Player = {
             this.Velocity += gfall * seconds; // faster fall velocity
         }
         this.PositionBottom += this.Velocity * seconds;
-        if (this.PositionBottom <= floorHeight) {
-            this.PositionBottom = floorHeight;
+        if (this.PositionBottom <= floorHeight + PlayerOffGround) {
+            this.PositionBottom = floorHeight + PlayerOffGround;
             this.Velocity = 0;
             this.OnGround = true;
             if (Player.Dead) return;
@@ -113,6 +114,8 @@ let Player = {
             }
         }
         this.updateVisuals();
+        this.reload();
+        
 
     },
     AddScore(toAdd) {
@@ -120,8 +123,8 @@ let Player = {
         UpdateSpeeds(this.Score);
     },
     updateVisuals() {
-        playerHitBoxDOM.style.bottom = this.PositionBottom + 20 + "px"; // 20 mta3 hitbox bch ykoun wst sprite
-        playerSpriteDOM.style.bottom = this.PositionBottom + "px";
+        playerHitBoxDOM.style.bottom = this.PositionBottom + "px"; // 20 mta3 hitbox bch ykoun wst sprite
+        playerSpriteDOM.style.bottom = this.PositionBottom - PlayerOffGround +"px";
     },
 };
 
