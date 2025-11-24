@@ -1,12 +1,9 @@
 // Bugs to fix : 
 // Animation t3 kolchy
-// HitBox is off when jumping 
 //
 // Features to add :
 // Biomes.
-// Enemies #ON GOING
 // Trees, flowers ..
-// Fix restarting (reset everything)
 // Preloading
 
 
@@ -19,7 +16,6 @@ const scoreDOM = document.getElementById("Score");
 const menuDOM = document.getElementById("Menu");
 const gameDOM = document.getElementById("Game");
 const BackgroundsDOM = document.getElementsByClassName("Background");
-const EndBackgroundsDOM = document.getElementsByClassName("EndBackground");
 const DeathDOM = document.getElementById("DeathAnimation");
 
 // Local Storage
@@ -71,7 +67,7 @@ const EnemyTypes = [                                 // different types of enemi
         name: "Bird",
         image: "",
         Speed: 300,
-        weight: 200,
+        weight: 2,
     }
 ];
 
@@ -242,15 +238,6 @@ function UpdateAndSpawnEnemies(seconds) {
             e.destructor();
             CurrentEnemies.splice(i, 1); // at position i remove 1 element 
         }
-
-       // console.log("Right < Left",e.PositionRight < Player.PositionLeft);
-       // console.log("Left > Right",e.PositionLeft > Player.PositionRight);
-       // console.log("Top < Bottom",e.PositionTop < Player.PositionBottom);
-       // console.log("Bottom > Top",e.PositionBottom > Player.PositionTop);
-       console.log('Enemy Bottom:',e.PositionBottom);
-       console.log('Player Top:', Player.PositionTop);
-
-        console.log('-------------------------');
         if (!e.Collided && isColliding(e, Player)) {
             e.destructor();
             CurrentEnemies.splice(i, 1); // at position i remove 1 element
@@ -263,10 +250,10 @@ async function GameOver() {
     Player.Dead = true;
     document.getElementById("ResetGame").disabled = true;
     Player.Velocity = 300;
-    CurrentEnemies.forEach(element => {
-        element.destructor();  // remove all enemies
-        CurrentEnemies.length--;
-    });
+    while (CurrentEnemies.length) {
+        const e = CurrentEnemies.pop();
+        if (e) e.destructor();
+    }
 
     gfall = -500; // slower fall for death animation
     KillAllAnimations(playerHitBoxDOM);
@@ -340,7 +327,7 @@ function UpdateSpeeds(Score) {
         for (let i = speeds.length - 1; i >= 0; i--) {
             speeds[i] = speedsDefault[i] + u * (20 - (5 * (speeds.length - i))); // backgroundspeeds: add 20 to the closest background, 15 to the one after it , 10 after it....
         }
-        EnemyTypes.forEach(enemy => {enemy
+        EnemyTypes.forEach(enemy => {
             enemy.Speed = 300 + u * 20;  // enemyspeeds: add 20 speed to each enemy
         });
         previousScoreDivision = u;
@@ -398,7 +385,6 @@ function StartGame() {
     btn2.style.display = "block";
     btn2.disabled = false;
 
-
     HideMenuAndShowGame(true);
     floorDOM.style.backgroundImage = `url("${BiomeImage}")`;
     Player.Score = 0;
@@ -411,16 +397,13 @@ function StartGame() {
     PositionFloor = 0;
     GameStarted = true;
     gfall = g * 1.5;
-    floorSpeed = 300;
-    PositionFloor = 0;
     backgroundOffsets = [0, 0, 0, 0, 0];
     previousScoreDivision = 0;
     spawnTimer = 0;
-    CurrentEnemies.forEach(element => {
-        element.destructor(); // remove all enemies 
-        CurrentEnemies.length--;
-    });
-    CurrentEnemies = [];
+    while (CurrentEnemies.length) {
+        const e = CurrentEnemies.pop();
+        if (e) e.destructor();
+    }
     minSpawnDelay = 3;
     nextSpawnTime = 3;
 
