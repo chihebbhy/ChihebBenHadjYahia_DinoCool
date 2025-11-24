@@ -19,7 +19,13 @@ const scoreDOM = document.getElementById("Score");
 const menuDOM = document.getElementById("Menu");
 const gameDOM = document.getElementById("Game");
 const BackgroundsDOM = document.getElementsByClassName("Background");
+const EndBackgroundsDOM = document.getElementsByClassName("EndBackground");
 const DeathDOM = document.getElementById("DeathAnimation");
+
+// Local Storage
+if (localStorage.getItem("HighScore")) {
+    document.getElementById("HighScore").innerHTML = "Highest Score: " + String(localStorage.getItem("HighScore")).padStart(5, '0');
+}
 // Constants 
 const g = -1000;
 let gfall = g * 1.5;                               // gravity 
@@ -64,7 +70,7 @@ const EnemyTypes = [                                 // different types of enemi
         name: "Bird",
         image: "",
         Speed: 300,
-        weight: 2,
+        weight: 200,
     }
 ];
 
@@ -93,11 +99,12 @@ let Player = {
         } else {
             this.Velocity += gfall * seconds; // faster fall velocity
         }
-        this.PositionBottom += Player.Velocity * seconds;
+        this.PositionBottom += this.Velocity * seconds;
         if (this.PositionBottom <= floorHeight) {
             this.PositionBottom = floorHeight;
             this.Velocity = 0;
             this.OnGround = true;
+            if (Player.Dead) return;
             playerSpriteDOM.classList.remove("JumpAndRotate");
             playerHitBoxDOM.classList.remove("JumpAndRotate");
             if (!playerSpriteDOM.classList.contains("Standing") && !Player.Ducking) {
@@ -109,7 +116,7 @@ let Player = {
 
     },
     AddScore(toAdd) {
-        this.Score += toAdd;
+        this.Score += toAdd ;
         UpdateSpeeds(this.Score);
     },
     updateVisuals() {
@@ -131,13 +138,17 @@ class Enemies {
         const css = window.getComputedStyle(this.DOM);
 
         this.x = window.innerWidth;
+        if(this.Type.name == "Bird"){
+            this.y = floorHeight + parseInt(css.height)+ 200; // birds fly higher
+        }else{
         this.y = floorHeight;
-
+        }
         this.DOM.style.left = this.x + "px";
         this.DOM.style.bottom = this.y + "px";
 
     }
     update(seconds) {
+        if (!this.DOM) return;
         this.x -= this.Velocity * seconds;
         this.DOM.style.left = this.x + "px";
         const css = window.getComputedStyle(this.DOM);
@@ -147,7 +158,7 @@ class Enemies {
         this.PositionTop = this.PositionBottom + parseInt(css.height);
     }
     destructor() {
-        if (this.DOM.parentNode && this.DOM) {
+        if (this.DOM && this.DOM.parentNode) {
             this.DOM.parentNode.removeChild(this.DOM);
         }
         this.DOM = null;
@@ -196,7 +207,6 @@ function UpdateBackground(seconds) {
         }
 
         BackgroundsDOM[i].style.backgroundPositionX = backgroundOffsets[i] + "px";
-
     }
 
 }
@@ -218,13 +228,10 @@ function UpdateAndSpawnEnemies(seconds) {
     if (spawnTimer >= nextSpawnTime) {
         spawnTimer = 0;
         nextSpawnTime = minSpawnDelay + Math.random() * minSpawnDelay;
-
         var type = getRandomEnemyType();
-
         CurrentEnemies.push(new Enemies(type));
-    }
 
-    // move the already existing enemies
+    } // move the already existing enemies
     for (let i = 0; i < CurrentEnemies.length; i++) {
         let e = CurrentEnemies[i];
         e.update(seconds);
@@ -232,42 +239,91 @@ function UpdateAndSpawnEnemies(seconds) {
             e.destructor();
             CurrentEnemies.splice(i, 1); // at position i remove 1 element 
         }
+
+       // console.log("Right < Left",e.PositionRight < Player.PositionLeft);
+       // console.log("Left > Right",e.PositionLeft > Player.PositionRight);
+       // console.log("Top < Bottom",e.PositionTop < Player.PositionBottom);
+       // console.log("Bottom > Top",e.PositionBottom > Player.PositionTop);
+       console.log('Enemy Bottom:',e.PositionBottom);
+       console.log('Player Top:', Player.PositionTop);
+
+        console.log('-------------------------');
         if (!e.Collided && isColliding(e, Player)) {
-            console.log("dead");
-            e.Collided = true;
+            e.destructor();
+            CurrentEnemies.splice(i, 1); // at position i remove 1 element
             GameOver();
         }
     }
 }
 
-function GameOver() {
+async function GameOver() {
     Player.Dead = true;
     Player.Velocity = 300;
     CurrentEnemies.forEach(element => {
         element.destructor();  // remove all enemies
+        CurrentEnemies.length--;
     });
 
-
     gfall = -500; // slower fall for death animation
-    setTimeout(() => { // first wait for the player to fall
-        gfall = -1500; // reset gravity after animation
-        playerSpriteDOM.classList.remove('Standing', 'JumpAndRotate', 'Duck');
-        playerSpriteDOM.style.animation = "";
-        playerSpriteDOM.style.backgroundImage = 'url("Resources/Cloud/Cloud.png") !important';
-        playerSpriteDOM.style.zIndex = 1000;
-        setTimeout(() => { // second wait to start death animation 
+    KillAllAnimations(playerHitBoxDOM);
+    KillAllAnimations(playerSpriteDOM);
 
-            DeathDOM.classList.add("Start");
-            playerSpriteDOM.classList.add("Death"); 
-                DeathDOM.style.opacity = "1";
+    playerSpriteDOM.classList.remove('Standing', 'JumpAndRotate', 'Duck', 'Death'); // remove all classes
+    playerHitBoxDOM.classList.remove('Standing', 'JumpAndRotate', 'Duck', 'Death');
 
-        }, 1000) // time to start animating
-    }, 1500); 
-// change the settimeouts to a promise to make it cleaner
-//
-// finally show menu after death animation 
+    playerSpriteDOM.classList.add("Chilling");
+
+    await wait(1500); // wait for the player to fall
+
+    gfall = -1500; // reset gravity after animation
+    playerSpriteDOM.style.zIndex = 1008;
+
+    await wait(1000); // wait to start death animation
+    DeathDOM.style.display = "inline-block";
+    DeathDOM.classList.add("Start");
+
+    document.getElementById("DeathScreen").removeAttribute("hidden");
+
+    playerSpriteDOM.classList.add("Death");
+    DeathDOM.style.opacity = "1";
+
+    await wait(3000); // wait for death animation to finish
+
+    // show final score 
+    let finalScore = Math.round(Player.Score);
+    let FinalScoreDOM = document.getElementById("FinalScore");
+    FinalScoreDOM.style.visibility = "visible";
+    FinalScoreDOM.style.animation = "opacity 1.5s forwards";
+    FinalScoreDOM.innerHTML = "Score: " + String(finalScore);
+    // show replay button
+    const PlayAgainDOM = document.getElementById("PlayAgain");
+    PlayAgainDOM.style.visibility = "visible";
+
+    // update highscore if needed
+    if (!localStorage.getItem("HighScore") || finalScore > parseInt(localStorage.getItem("HighScore"))) {
+        localStorage.setItem("HighScore", finalScore);
+        document.getElementById("HighScore").innerHTML = "Highest Score: " + String(finalScore).padStart(5, '0');
+
+    }
 }
 
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function KillAllAnimations(element) {
+    element.className = ""; // remove all classes to kill animations
+    element.style.animation = "none";
+    element.style.transition = "none";
+    element.getAnimations().forEach(a => a.cancel());
+
+    void element.offsetWidth; // trigger reflow
+    element.style.transform = "none";
+    element.style.animation = "";
+    element.style.transition = "";
+
+}
+// updates speeds based on score
 function UpdateSpeeds(Score) {
     var u = Math.floor(Score / 100);
     if (u > previousScoreDivision) {
@@ -280,7 +336,7 @@ function UpdateSpeeds(Score) {
         for (let i = speeds.length - 1; i >= 0; i--) {
             speeds[i] = speedsDefault[i] + u * (20 - (5 * (speeds.length - i))); // backgroundspeeds: add 20 to the closest background, 15 to the one after it , 10 after it....
         }
-        EnemyTypes.forEach(enemy => {
+        EnemyTypes.forEach(enemy => {enemy
             enemy.Speed = 300 + u * 20;  // enemyspeeds: add 20 speed to each enemy
         });
         previousScoreDivision = u;
@@ -291,6 +347,7 @@ function UpdateSpeeds(Score) {
 function UpdateGame(dt) {
     // calcul physique
     const seconds = dt / 1000;
+
     if (GameStarted) {
         Player.ApplyPhysics(seconds);
         if (!Player.Dead) {
@@ -344,13 +401,51 @@ function StartGame() {
     Player.Velocity = 0;
     Player.Ducking = false;
     Player.OnGround = true;
+    Player.Dead = false;
     Player.PositionBottom = floorHeight;
     floorSpeed = 300;
     PositionFloor = 0;
     GameStarted = true;
+    gfall = g * 1.5;
+    floorSpeed = 300;
+    PositionFloor = 0;
+    backgroundOffsets = [0, 0, 0, 0, 0];
+    previousScoreDivision = 0;
+    spawnTimer = 0;
+    CurrentEnemies.forEach(element => {
+        element.destructor(); // remove all enemies 
+        CurrentEnemies.length--;
+    });
+    CurrentEnemies = [];
+    minSpawnDelay = 3;
+    nextSpawnTime = 3;
+
+    playerSpriteDOM.style.zIndex = 8;
+    playerSpriteDOM.classList.remove('JumpAndRotate', 'Duck', 'Death', 'Chilling'); // remove all classes
+    playerHitBoxDOM.classList.remove('JumpAndRotate', 'Duck', 'Death', 'Chilling');
+    playerSpriteDOM.style.animation = "";
+    playerHitBoxDOM.style.animation = "";
+    playerSpriteDOM.style.transition = "";
+    playerHitBoxDOM.style.transition = "";
+    playerSpriteDOM.style.transform = "";
+    playerHitBoxDOM.style.transform = "";
+    playerSpriteDOM.classList.add("Standing");
+    playerHitBoxDOM.classList.add("Standing");
+    Player.updateVisuals();
+    document.getElementById("DeathScreen").setAttribute("hidden", "true");
+    document.getElementById("FinalScore").style.visibility = "hidden";
+    document.getElementById("PlayAgain").style.visibility = "hidden";
+    DeathDOM.classList.remove("Start");
+    DeathDOM.style.display = "none";
+    DeathDOM.style.opacity = "0";
+
+
     LastFrameTime = performance.now();
     playerSpriteDOM.style.imageSmoothingEnabled = false; // idkkkkkkkkkkkkkkkkkkkkkkkkkkkk
     GameLoopId = GameLoop(0);
+
+    // reset score display
+    
 
 }
 
@@ -377,25 +472,21 @@ function ResetGame() {
 
 // to jump or duck
 document.addEventListener('keydown', function (event) {
-    if (!GameStarted || event.repeat) return;
+    if (!GameStarted || event.repeat || Player.Dead) return;
     var key = event.key;
     var code = event.code;
-    if (code == "Space") {
-        // ynagz
+    if (code == "Space") { // ynagz
         if (Player.OnGround) {
-            Player.Velocity = 800; // valeur 3ejbetni
+            Player.Velocity = 1000; // valeur 3ejbetni
             Player.OnGround = false;
             playerSpriteDOM.classList.remove("Duck", "Standing");
             playerSpriteDOM.classList.add("JumpAndRotate");
             playerHitBoxDOM.classList.remove("Duck", "Standing");
             playerHitBoxDOM.classList.add("JumpAndRotate");
         }
-
-
     }
-    if (code == "ArrowDown") {
-        //duck
-        if (Player.OnGround && !Player.Ducking) {
+    if (code == "ArrowDown") {//duck
+        if (Player.OnGround && !Player.Ducking) { 
             Player.Ducking = true;
             playerSpriteDOM.classList.add("Duck");
             playerSpriteDOM.classList.remove("Standing");
@@ -420,5 +511,4 @@ document.addEventListener('keyup', function (event) {
     }
 }
 )
-
 

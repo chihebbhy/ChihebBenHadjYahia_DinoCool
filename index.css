@@ -1,6 +1,9 @@
 /*
  Z INDEX LIST:
-    999      Death Screen Animation // only shows on death
+    1010    Final Score on Death Screen
+    1009    Play Again Button on Death Screen
+    1008    Player Death Animation // only shows on death
+    1005 -> 1000   End Background Trees // only shows on death
     10      All buttons and Score
     9       Floor 
     8       Player  // 900 on death in js
@@ -22,33 +25,40 @@ html {
     image-rendering: pixelated;
 }
 
-/* -----------------Player----------------- */
-#Player{
+/* ------------------------------------------------Player---------------------------------------------------------------- */
+#Player {
     background-color: aqua;
-    z-index: 8 ;
+    z-index: 8;
 
 }
-#PlayerHitBox{
+
+#PlayerHitBox {
     position: absolute;
-    bottom: calc(90px + 20px); /* 96px is the ground's height */
+    bottom: calc(90px + 20px);
+    /* 96px is the ground's height */
     left: calc(15% + 63px);
+    background-color: tomato;
     z-index: 32;
 }
+
 #PlayerHitBox.Standing {
-    height: calc(40px * 2.5);  
-    width: calc(60px * 3.2);   
+    height: calc(40px * 2.5);
+    width: calc(60px * 3.2);
 }
-#PlayerHitBox.JumpAndRotate{
-    height: calc(40px * 2.5);  
-    width: calc(60px * 3.2);   
+
+#PlayerHitBox.JumpAndRotate {
+    height: calc(40px * 2.5);
+    width: calc(60px * 3.2);
     transition: transform 1.4s ease-out;
     transform: rotate(360deg);
 }
-#PlayerSprite{
+
+#PlayerSprite,
+#PlayerSprite.Chilling {
     background-image: url("Resources/Cloud/Cloud.png");
     position: absolute;
     bottom: 96px;
-    left: 15%; 
+    left: 15%;
     background-position: center bottom;
     background-repeat: no-repeat;
     background-size: cover;
@@ -56,59 +66,100 @@ html {
 
 }
 
+#PlayerSprite.Chilling {
+    height: calc(40px * 5.5);
+    width: calc(60px * 5.5);
+}
+
 #PlayerSprite.Standing {
-    height: calc(40px * 5.5);  
-    width: calc(60px * 5.5);   
-    animation: run 3s infinite ;
+    height: calc(40px * 5.5);
+    width: calc(60px * 5.5);
+    animation: run 3s infinite;
 }
 
 #PlayerSprite.JumpAndRotate {
     background-image: url("Resources/Cloud/Cloud.png");
-    height: calc(40px * 5.5);  
-    width: calc(60px * 5.5);   
+    height: calc(40px * 5.5);
+    width: calc(60px * 5.5);
     transition: transform 1.4s ease-out;
-    transform: rotate(360deg) ;
+    transform: rotate(360deg);
 }
 
 .Duck {
-    width: calc(35px * 6.8); 
-    height: calc(18px * 6.8) ; 
+    width: calc(35px * 6.8);
+    height: calc(18px * 6.8);
 }
+
 #PlayerSprite.Death {
     animation: DeathWalk 5s forwards;
     position: absolute;
 }
+
 @keyframes startduck {
-    0% , 40% {background-image: url("Resources/Frames/Crouching (faceless)/CrouchRunningFrame1.png");}
-    41% , 80% {background-image: url("Resources/Frames/Crouching (faceless)/CrouchRunningFrame2.png");}
-    81% , 100% {background-image: url("Resources/DuckingFrame3.png");}
+
+    0%,
+    40% {
+        background-image: url("Resources/Frames/Crouching (faceless)/CrouchRunningFrame1.png");
+    }
+
+    41%,
+    80% {
+        background-image: url("Resources/Frames/Crouching (faceless)/CrouchRunningFrame2.png");
+    }
+
+    81%,
+    100% {
+        background-image: url("Resources/DuckingFrame3.png");
+    }
 
 }
+
 @keyframes run {
-    0%,24%{background-image: url("Resources/Cloud/Running/NewRunningFrame1.png");}
-    25%,49% {background-image: url("Resources/Cloud/Running/NewRunningFrame3.png");}
-    50%,74% {background-image: url("Resources/Cloud/Running/NewRunningFrame2.png");}
-    75%,100% {background-image: url("Resources/Cloud/Running/NewRunningFrame4.png");}
+
+    0%,
+    24% {
+        background-image: url("Resources/Cloud/Running/NewRunningFrame1.png");
+    }
+
+    25%,
+    49% {
+        background-image: url("Resources/Cloud/Running/NewRunningFrame3.png");
+    }
+
+    50%,
+    74% {
+        background-image: url("Resources/Cloud/Running/NewRunningFrame2.png");
+    }
+
+    75%,
+    100% {
+        background-image: url("Resources/Cloud/Running/NewRunningFrame4.png");
+    }
 
 }
+
 @keyframes DeathWalk {
-    0% {    
-        left : calc(15%) ;
-        bottom : 96px ;    }
-    100% {    
-        left : calc(50% - calc(60px * 5.5) / 2) ;  /* 5.5 is the scale factor */
-        bottom : calc(50% - calc(40px * 5.5) / 2 + 40px) ;  /* 5.5 is the scale factor */
-}
+    0% {
+        left: calc(15%);
+        bottom: 96px;
+    }
+
+    100% {
+        left: calc(50% - calc(60px * 5.5) / 2 + 10px);
+        /* 5.5 is the scale factor */
+        bottom: calc(50% - calc(40px * 5.5) / 2 + 40px);
+        /* 5.5 is the scale factor */
+    }
 
 }
 
-/* --------------------FLOOR------------------------- */
+/* -------------------------------------------------FLOOR------------------------------------------------------------ */
 
 #Floor {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: calc(2304px * 5 );
+    width: calc(2304px * 5);
     height: calc(96px);
     background-repeat: repeat-x;
     background-size: contain;
@@ -118,12 +169,13 @@ html {
 
 #Floor div.FloorExpanded {
     width: 2000px;
-}  
+}
 
-/* ----------------------SCORE-------------------------- */
+/* ---------------------------------------------------SCORE--------------------------------------------------------- */
 
-#Score{
+#Score {
     background-color: #ffd98e;
+    color: #3a1f0b;
     font-size: 50px;
     position: absolute;
     top: 20px;
@@ -132,17 +184,39 @@ html {
     padding: 8px;
     letter-spacing: 2px;
     border: 4px solid #8b5a2b;
-    border-bottom: 8px solid #8b5a2b; 
-    border-radius: 8px;    
-    font-family: 'Myfont','Courier New', Courier, monospace;
+    border-bottom: 8px solid #8b5a2b;
+    border-radius: 8px;
+    font-family: 'Myfont', 'Courier New', Courier, monospace;
     text-align: left;
     z-index: 10;
 
 }
 
-/* -----------------------Backrgound---------------------- */
+#FinalScore {
+    background-color: #ffd98e;
+    color: #3a1f0b;
+    font-size: 50px;
+    position: absolute;
+    padding: 8px;
+    padding-bottom: 15px;
+    letter-spacing: 2px;
+    border: 4px solid #8b5a2b;
+    border-bottom: 6px solid #8b5a2b;
+    border-radius: 8px;
+    font-family: 'Myfont', 'Courier New', Courier, monospace;
+    bottom: calc(50% - calc(40px * 5.5) / 2 - 50px);
+    left: calc(50% - calc(200px) / 2 - 8px);
+    /* center horizontally */
+    min-height: 40px;
+    width: 200px;
+    visibility: hidden;
+    z-index: 1010;
+    text-align: center;
+}
 
-.Background{
+/* -------------------------------------------Backrgound------------------------------------------------------------- */
+
+.Background {
     position: fixed;
     top: 0;
     bottom: 90px;
@@ -150,49 +224,92 @@ html {
     height: 100%;
     width: 100%;
     background-repeat: repeat-x;
-    background-size: 100% calc(100% - 90px) ;
+    background-size: 100% calc(100% - 90px);
     background-position-x: 0;
 
-} 
-#Background1{
+}
+
+.EndBackground {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background-repeat: none;
+    background-size: contain;
+    background-position-x: 300px;
+}
+
+#Background1 {
     background-image: url("Resources/Extra/Parallax Background/plx-1.png");
     z-index: 1;
 }
-#Background2{
+
+#Background2 {
     background-image: url("Resources/Extra/Parallax Background/plx-2.png");
     z-index: 2;
 }
-#Background3{
+
+#Background3 {
     background-image: url("Resources/Extra/Parallax Background/plx-3.png");
     z-index: 3;
 }
-#Background4{
+
+#Background4 {
     background-image: url("Resources/Extra/Parallax Background/plx-4.png");
     z-index: 4;
 }
-#Background5{
-    background-image: url("Resources/Extra/Parallax Background/plx-5.png");
-    z-index: 5;}
 
-/* ---------------------------Enemies-------------------------- */
-.Enemy{
+#Background5 {
+    background-image: url("Resources/Extra/Parallax Background/plx-5.png");
+    z-index: 5;
+}
+
+
+#EndBackground1 {
+    background-image: url("Resources/trees.png");
+    z-index: 1006;
+    background-size: contain;
+}
+
+#EndBackground2 {
+    background-image: url("Resources/far-mountains.png");
+    z-index: 1005;
+}
+
+#EndBackground3 {
+    background-image: url("Resources/far-clouds.png");
+    z-index: 1002;
+}
+
+#EndBackground4 {
+    background-image: url("Resources/sky.png");
+    z-index: 1001;
+}
+
+
+/* ---------------------------------------------Enemies----------------------------------------------------------------- */
+.Enemy {
     position: absolute;
     z-index: 7;
     height: 150px;
     width: 80px;
 }
-.Bird{
+
+.Bird {
     background-color: aqua;
 }
 
-.LargeCactus{
+.LargeCactus {
     background-color: green;
 }
-.SmallCactus{
+
+.SmallCactus {
     background-color: lightgreen;
 }
 
-/* ---------------------------Video---------------------------- */
+/* -------------------------------------------------Video-------------------------------------------------------------- */
 
 #Video {
     position: fixed;
@@ -204,7 +321,7 @@ html {
 
 }
 
-/* ---------------------------Menu---------------------------- */
+/* --------------------------------------------------Menu------------------------------------------------------------- */
 #Menu {
     position: absolute;
     top: 0px;
@@ -225,29 +342,63 @@ html {
     z-index: 10;
 }
 
-#StartButton,
-#ResetGame {
-    font-family: 'Press Start 2P';
-    background-color: #f4c16d;
-    color: #5a3a1b;
-    border: 3px solid #8b5a2b;
-    border-radius: 6px;
-    padding: 12px 24px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    box-shadow: 0 4px #8b5a2b;
-    z-index: 10;
+#StartButton {
+    font-size: 50px;
+    margin-top: 20px;
+    border-radius: 10px;
+    border-width: 6px;
 }
 
 #ResetGame {
     position: absolute;
     right: 20px;
-    top: 20px;  
+    top: 20px;
+    border-radius: 6px;
+    font-size: 40px;
 }
 
+#ResetGame,
+#StartButton {
+    font-family: 'myFont', 'Press Start 2P';
+    background-color: #f4c16d;
+    color: #3a1f0b;
+    border: 3px solid #8b5a2b;
+    padding: 12px 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px; 
+    cursor: pointer;
+    box-shadow: 0 4px #8b5a2b;
+    z-index: 10;
+}
+
+#PlayAgain {
+    background-color: #ffd98e;
+    visibility: hidden;
+    z-index: 1009;
+    color: #3a1f0b;
+    position: absolute;
+    bottom: calc(50% - calc(40px * 5.5) / 2 - 150px);
+    left: calc(50% - calc(200px) / 2 - 5px);
+    /* center horizontally */ 
+    height: 80px;
+    width: 225px;
+    padding: 8px;
+    font-size: 50px;
+    padding: 8px;
+    padding-bottom: 15px;
+    letter-spacing: 2px;
+    border: 4px solid #8b5a2b;
+    border-bottom: 8px solid #8b5a2b;
+    border-radius: 8px;
+    font-family: 'Myfont', 'Courier New', Courier, monospace;
+    text-align: center;
+    cursor: pointer;
+}
+
+
 #StartButton:hover,
-#ResetGame:hover {
+#ResetGame:hover,
+#PlayAgain:hover {
     transition: all 0.1s ease-in-out;
     background-color: #ffd98e;
     color: #3a1f0b;
@@ -256,12 +407,14 @@ html {
 }
 
 #StartButton:active,
-#ResetGame:active {
+#ResetGame:active,
+#PlayAgain:active {
     background-color: #e6b15e;
     transform: translateY(2px);
     box-shadow: 0 2px #8b5a2b;
 }
-/* ------------------------------------------------------------ */
+
+/* -------------------------------------------------------------------------------------------------------------------- */
 #Game {
     width: 100%;
     height: 100%;
@@ -271,9 +424,9 @@ html {
     visibility: hidden;
 }
 
-/* -------------------------Death------------------------------- */
+/* -----------------------------------------------Death----------------------------------------------------------------- */
 
-#DeathAnimation{
+#DeathAnimation {
     position: fixed;
     top: 0;
     left: 0;
@@ -281,14 +434,29 @@ html {
     height: 100%;
 
 }
-#DeathAnimation.Start{
+
+#DeathAnimation.Start {
     pointer-events: none;
-    background: darkred;
     opacity: 0;
     z-index: 999;
-    animation: opacity 1.5s ;
+    animation: opacity 1.5s;
 }
+
+#DeathScreen {
+    opacity: 0;
+    animation: opacity 1.5s forwards;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+}
+
 @keyframes opacity {
-   from {opacity: 0;} 
-    to{opacity: 1;}
-}   
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

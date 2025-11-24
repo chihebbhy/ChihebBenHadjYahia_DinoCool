@@ -37,7 +37,7 @@
             </section>
             <button id="StartButton" onclick="StartGame()">Start game</button>
 
-            <h3>
+            <h3 id="HighScore">
                 Highest Score: 00000
             </h3>
 
@@ -64,6 +64,14 @@
 
             </div>
         </section>
+        <div id="DeathScreen" hidden>
+            <div id="EndBackground1" class="EndBackground"></div>
+            <div id="EndBackground2" class="EndBackground"></div>
+            <div id="EndBackground3" class="EndBackground"></div>
+            <div id="EndBackground4" class="EndBackground"></div>
+        <div id="FinalScore" ></div>
+        <button id="PlayAgain" onclick="StartGame()"> Replay</button>
+        </div>
         <script src="index.js"></script>
     </body>
 </html>
