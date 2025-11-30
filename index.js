@@ -24,14 +24,14 @@ if (localStorage.getItem("HighScore")) {
 }
 // Constants 
 const g = -1000;
-let gfall = g * 1.5;                               // gravity 
+let gfall = g * 1.5;                                 // gravity 
 const BiomeImage = 'Resources/Extra/ground.png';     // biomes 
 const floorHeight = 90;                              // self explanatory 
-const PlayerOffGround = 30;                          // height above the ground when the player is considered off the ground
+const PlayerOffGround = 50;                          // height above the ground when the player is considered off the ground
 let floorSpeed = 300;                                // the speed that the floor goes by at
 let PositionFloor = 0;                               // used to make the floor scroll by 
-const speeds = [0, 50, 130, 200, 300];               // different speeds for different backgrounds
-const speedsDefault = [0, 50, 130, 200, 300];        //       
+let speeds = [0, 50, 130, 200, 300];                 // different speeds for different backgrounds
+let speedsDefault = [0, 50, 130, 200, 300];          //       
 let backgroundOffsets = [0, 0, 0, 0, 0];             // backgrounds offsets
 
 // Score
@@ -48,32 +48,49 @@ let GameLoopId;
 // enemy spawning variables
 let spawnTimer = 0
 let CurrentEnemies = [];
-let minSpawnDelay = 3;
+let minSpawnDelay = 2;
 let nextSpawnTime = 3;
 const EnemyTypes = [                                 // different types of enemies
     {
-        name: "SmallCactus",
-        image: "",
+        name: "FirstCactus",
         Speed: 300,
-        weight: 5,
+        weight: 1,
     },
     {
-        name: "LargeCactus",
-        image: "",
+        name: "SecondCactus",
         Speed: 300,
-        weight: 3,
+        weight: 1,
     },
     {
-        name: "Bird",
-        image: "",
+        name: "ThirdCactus",
         Speed: 300,
+        weight: 1,
+    },
+    {
+        name: "FourthCactus",
+        Speed: 300,
+        weight: 1,
+    },
+    {
+        name: "OrangePlane",
+        Speed: 500,
         weight: 2,
-    }
+    },
+    {
+        name: "RedPlane",
+        Speed: 600,
+        weight: 1,
+    },
+    {
+        name: "GreenPlane",
+        Speed: 400,
+        weight: 1,
+    },
 ];
 
 // our player
 let Player = {
-    PositionBottom: parseInt(window.getComputedStyle(playerHitBoxDOM).bottom) , // position bl bottom
+    PositionBottom: parseInt(window.getComputedStyle(playerHitBoxDOM).bottom), // position bl bottom
     PositionTop: parseInt(window.getComputedStyle(playerHitBoxDOM).bottom) + parseInt(window.getComputedStyle(playerHitBoxDOM).height), // position top = bottom + kobr tswire(height)
     PositionLeft: parseInt(window.getComputedStyle(playerHitBoxDOM).left),
     PositionRight: parseInt(window.getComputedStyle(playerHitBoxDOM).left) + parseInt(window.getComputedStyle(playerHitBoxDOM).width),
@@ -84,7 +101,7 @@ let Player = {
     Score: 0,
     reload() {
         var PlayerCSS = window.getComputedStyle(playerHitBoxDOM);
-        this.PositionBottom = parseInt(PlayerCSS.bottom) ; // 20 mta3 hitbox bch ykoun wst sprite
+        this.PositionBottom = parseInt(PlayerCSS.bottom);
         this.PositionTop = parseInt(PlayerCSS.bottom) + parseInt(PlayerCSS.height);
         this.PositionLeft = parseInt(PlayerCSS.left);
         this.PositionRight = parseInt(PlayerCSS.left) + parseInt(PlayerCSS.width);
@@ -111,16 +128,16 @@ let Player = {
         }
         this.updateVisuals();
         this.reload();
-        
+
 
     },
     AddScore(toAdd) {
-        this.Score += toAdd ;
+        this.Score += toAdd;
         UpdateSpeeds(this.Score);
     },
     updateVisuals() {
-        playerHitBoxDOM.style.bottom = this.PositionBottom + "px"; // 20 mta3 hitbox bch ykoun wst sprite
-        playerSpriteDOM.style.bottom = this.PositionBottom - PlayerOffGround +"px";
+        playerHitBoxDOM.style.bottom = this.PositionBottom + "px";
+        playerSpriteDOM.style.bottom = this.PositionBottom - PlayerOffGround + "px";
     },
 };
 
@@ -137,10 +154,19 @@ class Enemies {
         const css = window.getComputedStyle(this.DOM);
 
         this.x = window.innerWidth;
-        if(this.Type.name == "Bird"){
-            this.y = floorHeight + parseInt(css.height)+ 200; // birds fly higher
-        }else{
-        this.y = floorHeight;
+        switch (this.Type.name) {
+            case "OrangePlane":
+                this.y = floorHeight + parseInt(css.height) + 100; // Plane fly higher
+                break;
+            case "RedPlane":
+                this.y = floorHeight + parseInt(css.height) + 40; // Plane fly higher
+                break;
+            case "GreenPlane":
+                this.y = floorHeight + parseInt(css.height) + 160; // Plane fly higher
+                break;
+            default:
+                this.y = floorHeight ; // on the floor
+
         }
         this.DOM.style.left = this.x + "px";
         this.DOM.style.bottom = this.y + "px";
@@ -148,6 +174,7 @@ class Enemies {
     }
     update(seconds) {
         if (!this.DOM) return;
+        this.Velocity = this.Type.Speed; // in case speed changed due to score
         this.x -= this.Velocity * seconds;
         this.DOM.style.left = this.x + "px";
         const css = window.getComputedStyle(this.DOM);
@@ -325,10 +352,10 @@ function UpdateSpeeds(Score) {
             minSpawnDelay = 0.5;
         }
         for (let i = speeds.length - 1; i >= 0; i--) {
-            speeds[i] = speedsDefault[i] + u * (20 - (5 * (speeds.length - i))); // backgroundspeeds: add 20 to the closest background, 15 to the one after it , 10 after it....
+            speeds[i] = speedsDefault[i] + u * (20 - (4 * (speeds.length - i))); // backgroundspeeds: add 20 to the closest background, 15 to the one after it , 10 after it....
         }
         EnemyTypes.forEach(enemy => {
-            enemy.Speed = 300 + u * 20;  // enemyspeeds: add 20 speed to each enemy
+            enemy.Speed = enemy.Speed + 20;  // enemyspeeds: add 20 speed to each enemy
         });
         previousScoreDivision = u;
     }
@@ -338,11 +365,9 @@ function UpdateSpeeds(Score) {
 function UpdateGame(dt) {
     // calcul physique
     const seconds = dt / 1000;
-
     if (GameStarted) {
         Player.ApplyPhysics(seconds);
         if (!Player.Dead) {
-
             UpdateFloor(seconds);
             UpdateBackground(seconds);
             UpdateAndSpawnEnemies(seconds);
@@ -396,15 +421,20 @@ function StartGame() {
     floorSpeed = 300;
     PositionFloor = 0;
     GameStarted = true;
-    gfall = g * 1.5;
-    backgroundOffsets = [0, 0, 0, 0, 0];
+    gfall = g * 1.5; // gravity when falling
+    backgroundOffsets = [0, 0, 0, 0, 0]; // offsets dhahra
+    speeds = [0, 50, 130, 200, 300]; // default backgrounds speed
+    let enemytypespeed = [300,300,300,300,500,600,400]; // enemy speed default
+    EnemyTypes.forEach(type =>{ // reset enemy speeds
+        type.Speed = enemytypespeed.shift();
+    })
     previousScoreDivision = 0;
     spawnTimer = 0;
     while (CurrentEnemies.length) {
         const e = CurrentEnemies.pop();
         if (e) e.destructor();
     }
-    minSpawnDelay = 3;
+    minSpawnDelay = 2;
     nextSpawnTime = 3;
 
     playerSpriteDOM.style.zIndex = 8;
@@ -430,9 +460,6 @@ function StartGame() {
     LastFrameTime = performance.now();
     playerSpriteDOM.style.imageSmoothingEnabled = false; // idkkkkkkkkkkkkkkkkkkkkkkkkkkkk
     GameLoopId = GameLoop(0);
-
-    // reset score display
-    
 
 }
 
@@ -462,7 +489,7 @@ document.addEventListener('keydown', function (event) {
     if (!GameStarted || event.repeat || Player.Dead) return;
     var key = event.key;
     var code = event.code;
-    if (code == "Space") { // ynagz
+    if (code == "Space" || code == "ArrowUp") { // ynagz
         if (Player.OnGround) {
             Player.Velocity = 1000; // valeur 3ejbetni
             Player.OnGround = false;
@@ -473,8 +500,8 @@ document.addEventListener('keydown', function (event) {
         }
     }
     if (code == "ArrowDown") {//duck
-        if (Player.OnGround && !Player.Ducking) { 
-            Player.Ducking = true;
+        if (Player.OnGround && !Player.Ducking) {
+            Player.Ducking = true; // start ducking
             playerSpriteDOM.classList.add("Duck");
             playerSpriteDOM.classList.remove("Standing");
             playerHitBoxDOM.classList.add("Duck");
@@ -485,11 +512,8 @@ document.addEventListener('keydown', function (event) {
 }
 )
 
-
-
-
 document.addEventListener('keyup', function (event) {
-    if (Player.Ducking && event.code == "ArrowDown") {
+    if (Player.Ducking && event.code == "ArrowDown") { // stop ducking
         Player.Ducking = false;
         playerSpriteDOM.classList.remove("Duck");
         playerSpriteDOM.classList.add("Standing");

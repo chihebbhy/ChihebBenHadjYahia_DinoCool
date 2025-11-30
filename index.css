@@ -27,27 +27,27 @@ html {
 
 /* ------------------------------------------------Player---------------------------------------------------------------- */
 #Player {
-    background-color: aqua;
     z-index: 8;
 
+    background-origin: bottom center;
 }
 
 #PlayerHitBox {
     position: absolute;
     bottom: calc(90px + 20px);
-    /* 96px is the ground's height */
-    left: calc(15% + 63px);
-    z-index: 32;
+    /* 90px is the ground's height */
+    left: calc(15% + 70px);
+
 }
 
 #PlayerHitBox.Standing {
-    height: calc(40px * 2.5);
-    width: calc(60px * 3.2);
+    height: calc(40px * 2.2);
+    width: calc(60px * 3);
 }
 
 #PlayerHitBox.JumpAndRotate {
-    height: calc(40px * 2.5);
-    width: calc(60px * 3.2);
+    height: calc(40px * 2.2);
+    width: calc(60px * 3);
     transition: transform 1.4s ease-out;
     transform: rotate(360deg);
 }
@@ -84,9 +84,19 @@ html {
     transform: rotate(360deg);
 }
 
-.Duck {
-    width: calc(35px * 6.8);
-    height: calc(18px * 6.8);
+#PlayerSprite.Duck {
+    left: calc(15% + 80px);
+    width: calc(60px * 3);
+    height: calc(40px * 3);
+    background-origin: bottom center;
+    animation: run 3s infinite;
+    background-size: cover;
+}
+
+#PlayerHitBox.Duck {
+    left: calc(15% + 90px);
+    width: calc(35px * 2.2);
+    height: calc(18px * 2.2);
 }
 
 #PlayerSprite.Death {
@@ -292,20 +302,62 @@ html {
 .Enemy {
     position: absolute;
     z-index: 7;
-    height: 150px;
-    width: 80px;
+    height: 64px;
+    width: 64px;
 }
 
-.Bird {
-    background-color: aqua;
+.OrangePlane {
+    background-image: url("Resources/OrangePlane.png");
+    height: 110px;
+    width: 175px;
+
 }
 
-.LargeCactus {
-    background-color: green;
+.RedPlane {
+    background-image: url("Resources/RedPlane.png");
+    height: 95px;
+    width: 180px;
+
 }
 
-.SmallCactus {
-    background-color: lightgreen;
+.GreenPlane {
+    background-image: url("Resources/GreenPlane.png");
+    height: 95px;
+    width: 230px;
+
+}
+
+.FirstCactus {
+    background-image: url("Resources/FirstCactus.png");
+    transform-origin: bottom;
+    height: calc(41px * 4);
+    width: calc(37px * 4);
+    background-size: cover;
+}
+
+.SecondCactus {
+    background-image: url("Resources/SecondCactus.png");
+    transform-origin: bottom;
+    height: calc(41px * 4);
+    width: calc(37px * 4);
+    background-size: cover;
+}
+
+.ThirdCactus {
+    background-image: url("Resources/ThirdCactus.png");
+
+    transform-origin: bottom;
+    height: calc(41px * 4);
+    width: calc(37px * 4);
+    background-size: cover;
+}
+
+.FourthCactus {
+    background-image: url("Resources/FourthCactus.png");
+    transform-origin: bottom;
+    height: calc(41px * 4);
+    width: calc(35px * 4);
+    background-size: cover;
 }
 
 /* -------------------------------------------------Video-------------------------------------------------------------- */
@@ -364,7 +416,7 @@ html {
     border: 3px solid #8b5a2b;
     padding: 12px 24px;
     text-transform: uppercase;
-    letter-spacing: 1px; 
+    letter-spacing: 1px;
     cursor: pointer;
     box-shadow: 0 4px #8b5a2b;
     z-index: 10;
@@ -378,7 +430,7 @@ html {
     position: absolute;
     bottom: calc(50% - calc(40px * 5.5) / 2 - 150px);
     left: calc(50% - calc(200px) / 2 - 5px);
-    /* center horizontally */ 
+    /* center horizontally */
     height: 80px;
     width: 225px;
     padding: 8px;
