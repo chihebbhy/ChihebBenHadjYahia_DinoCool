@@ -1,121 +1,95 @@
-            DinoCool — Jeu de course façon Chrome Dino
+# DinoCool — Jeu de course façon Chrome Dino 🦖
 
-DinoCool est un jeu web inspiré du célèbre jeu du dinosaure de Google Chrome.
-Le joueur contrôle un personnage capable de sauter et s'accroupir pour éviter les obstacles tout en accumulant un score basé sur le temps de survie.
-Le projet est entièrement réalisé en HTML / CSS / JavaScript et fonctionne directement dans le navigateur.
+**DinoCool** est un jeu web inspiré du célèbre jeu du dinosaure de Google Chrome.
+Le joueur contrôle un personnage capable de **sauter** et de **s'accroupir** pour éviter les obstacles tout en accumulant un score basé sur le temps de survie.
+Le projet est entièrement développé en **HTML, CSS et JavaScript** et fonctionne directement dans le navigateur.
 
-    Technologies utilisées
+---
 
-HTML5 — Structure de la page et des éléments du jeu
+## 🛠 Technologies Utilisées
 
-CSS3 — Styles, animations, mise en page, effets visuels
+* **HTML5** — Structure de la page et des éléments du jeu
+* **CSS3** — Styles, animations, mise en page, effets visuels
+* **JavaScript** — Gestion du gameplay, physique, collisions, boucle de jeu
+* **DOM Manipulation** — Création dynamique des entités
+* **requestAnimationFrame** — Mise à jour fluide du jeu
+* **Git / GitHub** — Contrôle de version et gestion du projet
 
-JavaScript — Gestion du gameplay, physique, collisions, boucle de jeu
+---
 
-DOM Manipulation — Création dynamique des entités
+## 🎮 Fonctionnalités Principales
 
-requestAnimationFrame — Mise à jour fluide du jeu
+* Gestion du **saut** et de la **gravité** du joueur
+* Animation du joueur avec rotation pendant le jump
+* Boucle de jeu limitée à **144 FPS** pour un rendu fluide
+* Système de score dynamique basé sur le temps de survie
+* Détection de collisions joueur / sol
+* Génération dynamique des éléments (ex: sol et obstacles)
+* Transition du menu vers le gameplay
+* Adaptation automatique aux changements de taille de fenêtre ou zoom
 
-Git / GitHub — Controle de version
+---
 
-    Fonctionnalités principales
+## 🌐 Lien GitHub Pages
 
-Gestion du saut du joueur avec vélocité et gravité
+[https://chihebbhy.github.io/ChihebBenHadjYahia_DinoCool/](https://chihebbhy.github.io/ChihebBenHadjYahia_DinoCool/)
 
-Animation du joueur avec un rotation jump
+---
 
-Boucle de jeu limitée à 144 FPS pour un rendu fluide
+## 💡 Concepts et Nouveautés Explorées
 
-Système de score dynamique basé sur le temps
+### JavaScript & Game Dev
 
-Détection de collisions player / sol
+* Implémentation d’une **boucle de jeu** avec contrôle du framerate
+* Utilisation de **requestAnimationFrame** pour un rendu optimisé
+* Calculs physiques : gravité, vélocité, temps (dt)
+* Gestion de collisions via positions absolues du DOM
+* Système d’entités dynamiques via **classes JavaScript**
 
-Génération dynamique des éléments (ex: sol)
+### CSS & Animations
 
-Transition du menu → gameplay
+* Animations CSS avec **transform** et **transition**
+* Utilisation de **classes dynamiques** pour animer les sprites
+* Mise en page responsive malgré l’utilisation d’éléments absolus
 
-Adaptation automatique aux changements de taille de fenêtre ou zoom
+### Git & Gestion de Projet
 
-    Lien vers la page GitHub Pages
+* Utilisation de `git add`, `commit`, `push`
+* Revenir à une version précédente
+* Organisation d’un projet web complet sur **GitHub**
 
-https://chihebbhy.github.io/ChihebBenHadjYahia_DinoCool/
+---
 
-    Nouveautés explorées
+## ⚠️ Difficultés Rencontrées et Solutions
 
-Durant ce projet, j’ai appris et expérimenté plusieurs concepts :
+**Problème 1 : Hitbox du joueur incorrecte**
 
-  Javascript & Game Dev
+* Déplacement de la hitbox lors du zoom ou resize
+* **Solution :** Recalcul automatique des positions avec `Player.reload()` et ajout d’un listener resize
 
-Implémentation d’une boucle de jeu avec contrôle du framerate
+**Problème 2 : FPS trop élevés**
 
-Utilisation de requestAnimationFrame pour un rendu optimisé
+* Le jeu tournait trop vite sur certains écrans 144Hz
+* **Solution :** Limitation via un interval fixé à 144 FPS
 
-Calculs physiques : gravité, vélocité, temps (dt)
+**Problème 3 : Animation du sol incorrecte**
 
-Gestion de collisions via positions absolues du DOM
+* Width ne se mettait pas à jour après la transition
+* **Solution :** Utilisation d’une **classe CSS temporaire** pour étendre proprement le sol
 
-Système d’entités dynamiques via classes JavaScript
+**Problème 4 : Placement incorrect des entités**
 
-  CSS & animations
+* Certaines entités créées dans le mauvais conteneur
+* **Solution :** Ajustement de la fonction `CreateEntity()` pour placer chaque élément correctement
 
-Animations CSS (transform, transition)
+---
 
-Utilisation de classes dynamiques pour animer les sprites
+## 🏁 Conclusion
 
-Mise en page responsive malgré les éléments absolus
+**DinoCool** m’a permis de découvrir la logique d’un moteur de jeu minimaliste :
 
-  Git 
+* Optimisation du framerate
+* Gestion des collisions et physique
+* Création d’un gameplay fluide et responsive
 
-Utilisation de git add, commit, push
-
-Revenir à une version précédente
-
-Organisation d’un projet web complet dans GitHub
-
-    Difficultés rencontrées
-
-Voici les principaux problèmes rencontrés pendant le développement :
-
-  Problème 1 : Le joueur ne détectait pas correctement le sol
-
-La hitbox pouvait se décaler lors du zoom ou du resize.
-
-  Problème 2 : Les FPS dépassaient 144 FPS
-
-Le jeu tournait trop vite sur certains écrans 144Hz.
-
-  Problème 3 : L’animation du sol ne s’étendait pas correctement
-
-La width ne se mettait pas à jour après la transition.
-
-  Problème 4 : Les erreurs liées au DOM lors de la création des entités
-
-Certaines entités étaient créées dans le mauvais conteneur.
-
-    Solutions apportées
-
-  Hitbox et position du joueur
-
-Recalcul automatique des positions avec Player.reload()
-
-Ajout d’un listener resize pour éviter les bugs lors du zoom
-
-  Limitation des FPS
-
-Mise en place d’un contrôle via un interval fixé (144 FPS)
-
-  Animation du sol
-
-Utilisation d’une classe CSS temporaire pour étendre proprement le sol
-
-  Placement des entités
-
-Ajustement de la fonction CreateEntity() pour placer chaque élément dans le bon conteneur
-
-    Conclusion
-
-DinoCool m’a permis de découvrir la logique d’un vrai moteur de jeu minimaliste :
-
-Optimisation FPS
-
-C’était un projet très complet et formateur.
+C’était un projet très complet et formateur, combinant **JavaScript, CSS et HTML** pour créer une expérience de jeu interactive directement dans le navigateur.
